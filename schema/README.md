@@ -13,4 +13,4 @@ After all I represent the ER-Diagram of the project.
 
 
 ## ER-Diagram
-<img src="er_diagram" width="800" />
+<img src="./er_diagram.png" width="800" />
