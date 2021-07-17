@@ -8,7 +8,7 @@ After all I represent the ER-Diagram of the project.
 
 
 ## Entities and Relations
-- <a href="./entities.md">Entities</a>
+- <a href="./entites.md">Entities</a>
 - <a href="./relations.md">Relations</a>
 
 
