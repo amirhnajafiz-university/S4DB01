@@ -1,0 +1,1 @@
+DELETE FROM special_user WHERE pro_id = '?';

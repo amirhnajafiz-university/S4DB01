@@ -1,0 +1,1 @@
+UPDATE 'user' SET point = '?' WHERE username = '?';
