@@ -1,2 +1,2 @@
-INSERT INTO admin (username, password)
-    VALUES('?', '?');
+INSERT INTO "admin" (username, password) 
+    VALUES(?,?);
