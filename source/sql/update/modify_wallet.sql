@@ -1,1 +1,1 @@
-UPDATE 'user' SET wallet = '?' WHERE username = '?';
+UPDATE "user" SET wallet = ? WHERE username = ?;
