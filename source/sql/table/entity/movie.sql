@@ -1,4 +1,4 @@
-CREATE TABLE 'movie' as (
+CREATE TABLE "movie" (
 	movie_id int,
 	movie_file varchar(1024) NOT NULL,
 	name varchar(50) NOT NULL,
