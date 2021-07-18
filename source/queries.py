@@ -23,8 +23,6 @@ def init(address, dic):
     for file in onlyfiles:
         with open(address + file, 'r') as myFile:
             dic[file[:-4]] = myFile.read()
-    print(dic)
-    print("\n\n")
 
 
 init(DELETE_DIR, DELETE_QUERIES)

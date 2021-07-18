@@ -1,1 +1,1 @@
-DROP DATABASE 'stream';
+DROP DATABASE "stream";

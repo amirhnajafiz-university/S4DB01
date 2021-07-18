@@ -1,3 +1,9 @@
+"""
+This file is the setup of our project,
+where we create the database of SQLite3 and we
+create our tables.
+
+"""
 import sqlite3 
 from sqlite3 import Error
 import os
