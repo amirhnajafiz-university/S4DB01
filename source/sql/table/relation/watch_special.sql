@@ -1,4 +1,4 @@
-CREATE TABLE 'watch' as (
+CREATE TABLE 'watch_special' as (
 	pro_id int,
 	movie_id int,
 	PRIMARY KEY (pro_id, movie_id),

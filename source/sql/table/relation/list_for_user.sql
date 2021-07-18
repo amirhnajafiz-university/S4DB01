@@ -1,4 +1,4 @@
-CREATE TABLE 'movie_in_list' as (
+CREATE TABLE 'list_for_user' as (
 	username varchar(50),
 	list_id int,
 	PRIMARY KEY (username, list_id),
