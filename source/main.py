@@ -1,6 +1,6 @@
 import sqlite3
 from sqlite3 import Error
-from createDB import create_connection, create_database, initialize_tables
+from createDB import create_connection, create_database, initialize_tables, initialize_triggers
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES
 from import_data import load_data
 import json
@@ -89,5 +89,6 @@ def import_temp_data(connection):
 
 if __name__ == '__main__':
     connection = create_connection(DATABASE)
+    initialize_triggers(connection=connection)
+    import_temp_data(connection=connection)
     connection.close()
-    init()
