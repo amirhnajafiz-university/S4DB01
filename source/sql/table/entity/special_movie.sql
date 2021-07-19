@@ -1,5 +1,7 @@
 CREATE TABLE "special_movie" (
-	movie_id int,
+	special_id int,
+	movie_id int NOT NULL,
 	price int NOT NULL,
-	PRIMARY KEY (movie_id)
+	PRIMARY KEY (special_id),
+	FOREIGN KEY (movie_id) REFERENCES "movie" (movie_id) ON DELETE CASCADE
 );

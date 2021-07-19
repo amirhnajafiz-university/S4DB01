@@ -7,5 +7,7 @@ CREATE TABLE "user" (
 	nationalID varchar(10) UNIQUE,
 	wallet int DEFAULT 0,
 	point int DEFAULT 0,
-	PRIMARY KEY (username)
+	reference varchar(50) DEFAULT NULL,
+	PRIMARY KEY (username),
+	FOREIGN KEY (reference) REFERENCES "user" (username)
 );
