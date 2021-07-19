@@ -1,0 +1,165 @@
+{
+    "0": {
+        "op": "insert_admin",
+        "data": {
+            "username": "amirhossein",
+            "password": "1270"
+        }
+    },
+    "1": {
+        "op": "insert_admin",
+        "data": {
+            "username": "jason",
+            "password": "AB1270"
+        }
+    },
+    "2": {
+        "op": "insert_movie",
+        "data": {
+            "movie_id": 1,
+            "movie_file": "File",
+            "name": "GOT",
+            "movie_year": 2012,
+            "description": "War for throne"
+        }
+    },
+    "3": {
+        "op": "insert_movie",
+        "data": {
+            "movie_id": 2,
+            "movie_file": "File",
+            "name": "Birds",
+            "movie_year": 1992,
+            "description": "The story of two birds, in real world."
+        }
+    },
+    "4": {
+        "op": "insert_movie",
+        "data": {
+            "movie_id": 3,
+            "movie_file": "File",
+            "name": "Terminator 2",
+            "movie_year": 1999,
+            "description": "A robot was send from future to kill everyone in present!"
+        }
+    },
+    "5": {
+        "op": "insert_movie",
+        "data": {
+            "movie_id": 4,
+            "movie_file": "File",
+            "name": "RED",
+            "movie_year": 2008,
+            "description": "A psychopath who is trying to kill everyone in one night."
+        }
+    },
+    "6": {
+        "op": "insert_movie",
+        "data": {
+            "movie_id": 5,
+            "movie_file": "File",
+            "name": "Home",
+            "movie_year": 2016,
+            "description": "Pixar home, is the best cartoon for kids."
+        }
+    },
+    "7": {
+        "op": "insert_user",
+        "data": {
+            "username": "user1",
+            "password": "p1",
+            "name": "Amir",
+            "email": "mail1",
+            "phonenumber": "993823122",
+            "nationalID": "0922633235",
+            "wallet": 0,
+            "point": 0
+        }
+    },
+    "8": {
+        "op": "insert_user",
+        "data": {
+            "username": "user2",
+            "password": "p2",
+            "name": "Hossein",
+            "email": "mail2",
+            "phonenumber": "993823122",
+            "nationalID": "092332354",
+            "wallet": 5,
+            "point": 1
+        }
+    },
+    "9": {
+        "op": "insert_user",
+        "data": {
+            "username": "user3",
+            "password": "p3",
+            "name": "Amir",
+            "email": "mail3",
+            "phonenumber": "993823122",
+            "nationalID": "0923321135",
+            "wallet": 10,
+            "point": 10
+        }
+    },
+    "10": {
+        "op": "insert_user",
+        "data": {
+            "username": "user4",
+            "password": "p4",
+            "name": "Ali",
+            "email": "mail4",
+            "phonenumber": "993823122",
+            "nationalID": "1132223235",
+            "wallet": 5,
+            "point": 2
+        }
+    },
+    "11": {
+        "op": "insert_user",
+        "data": {
+            "username": "user5",
+            "password": "p5",
+            "name": "Mansoor",
+            "email": "mail5",
+            "phonenumber": "9123122",
+            "nationalID": "0923122122235",
+            "wallet": 0,
+            "point": 0
+        }
+    },
+    "12": {
+        "op": "insert_user",
+        "data": {
+            "username": "user6",
+            "password": "p6",
+            "name": "Hesam",
+            "email": "mail6",
+            "phonenumber": "9938219822",
+            "nationalID": "01133235",
+            "wallet": 20,
+            "point": 3
+        }
+    },
+    "13": {
+        "op": "insert_tag",
+        "data": {
+            "tag_id": 1,
+            "name": "comedy"
+        }
+    },
+    "14": {
+        "op": "insert_tag",
+        "data": {
+            "tag_id": 2,
+            "name": "horror"
+        }
+    },
+    "15": {
+        "op": "insert_tag",
+        "data": {
+            "tag_id": 3,
+            "name": "action"
+        }
+    }
+}

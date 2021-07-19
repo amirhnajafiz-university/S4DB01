@@ -2,6 +2,8 @@ import sqlite3
 from sqlite3 import Error
 from createDB import create_connection, create_database, initialize_tables
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES
+from import_data import load_data
+import json
 
 
 DEF_DIR = './database/'
@@ -33,6 +35,10 @@ dml_queries = {
     "modify_wallet": {'list': UPDATE_QUERIES, 'params': {'wallet': 0, 'username': None}},
     "remove_user_pro": {'list': UPDATE_QUERIES, 'params': {'pro_id': None}}
 }
+
+# TODO: Create the get queries, for movie search, user login, user search, ...
+
+# TODO: Create the methods for testing get methods
 
 
 def init():
@@ -66,11 +72,23 @@ def execute_query(connection, query, inputs):
         c = connection.cursor()
         c.execute(dml_queries[query]['list'][query], inputs)
         connection.commit()
+        print("> Commited")
     except Error as e:
         print(e)
         connection.rollback()
 
 
+def import_temp_data(connection):
+    """
+    This method imports a template data to our database
+    """
+    data = load_data()
+    for obj in data.values():
+        execute_query(connection=connection, query=obj['op'], inputs=list(obj['data'].values()))
+
+
+
 if __name__ == '__main__':
     connection = create_connection(DATABASE)
+    execute_query(connection=connection, query='remove_user_pro', inputs=['3'])
     connection.close()
