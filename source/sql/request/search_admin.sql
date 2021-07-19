@@ -1,3 +1,3 @@
 SELECT *
-FROM "user"
+FROM "admin"
 WHERE username = ? AND password = ?;
