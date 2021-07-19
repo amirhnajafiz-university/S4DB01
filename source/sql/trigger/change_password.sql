@@ -1,11 +1,10 @@
 CREATE TRIGGER comment_on_movie
-ON user
-AFTER UPDATE
+ON "user"
+AFTER INSERT, UPDATE
 AS BEGIN
-    WHEN (LEN(user.password) < 6 )
+    IF (LEN(user.password) < 6)
     BEGIN
+     RAISERROR('Password is too weak!', 10, 1)
      ROLLBACK
     END;
 END;
-
-// TODO: Fix this

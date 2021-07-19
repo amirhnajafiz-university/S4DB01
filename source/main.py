@@ -29,7 +29,10 @@ dml_queries = {
     "change_password": {'list': UPDATE_QUERIES, 'params': {'password': None, 'username': None}},
     "modify_point": {'list': UPDATE_QUERIES, 'params': {'point': 0, 'username': None}},
     "modify_wallet": {'list': UPDATE_QUERIES, 'params': {'wallet': 0, 'username': None}},
-    "remove_user_pro": {'list': UPDATE_QUERIES, 'params': {'pro_id': None}}
+    "remove_user_pro": {'list': UPDATE_QUERIES, 'params': {'pro_id': None}},
+    "remove_movie_from_list": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0, 'list_id': 0}},
+    "remove_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0}},
+    "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}}
 }
 
 # TODO: Create the get queries, for movie search, user login, user search, ...

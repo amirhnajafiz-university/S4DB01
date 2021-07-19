@@ -1,0 +1,1 @@
+DELETE FROM "movie_in_list" WHERE movie_id = ? AND list_id = ?;

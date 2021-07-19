@@ -1,11 +1,10 @@
 CREATE TRIGGER watch_special_movie
-ON watch_special
+ON "watch_special"
 AFTER INSERT
 AS BEGIN
-    WHEN (watch_special.pro_id not int (SELECT pro_id FROM special_user))
+    IF (NEW.pro_id NOT IN (SELECT pro_id FROM special_user))
     BEGIN
+     RAISERROR('Not special user', 10, 1)
      ROLLBACK
     END;
 END;
-
-// TODO: Fix this
