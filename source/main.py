@@ -1,9 +1,7 @@
-import sqlite3
 from sqlite3 import Error
-from createDB import create_connection, create_database, initialize_tables, initialize_triggers
+from createDB import create_connection, create_database, initialize_tables
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES
 from import_data import load_data
-import json
 
 
 DEF_DIR = './database/'
@@ -36,8 +34,6 @@ dml_queries = {
 }
 
 # TODO: Create the get queries, for movie search, user login, user search, ...
-
-# TODO: Create the methods for testing get methods
 
 
 def init():
@@ -89,6 +85,4 @@ def import_temp_data(connection):
 
 if __name__ == '__main__':
     connection = create_connection(DATABASE)
-    initialize_triggers(connection=connection)
-    import_temp_data(connection=connection)
     connection.close()
