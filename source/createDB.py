@@ -13,6 +13,8 @@ MAIN_DIR = './sql/'
 INIT_DIR = MAIN_DIR + 'table/'
 INIT_PART = ['entity/', 'relation/']
 
+TRIGGER_DIR = MAIN_DIR + 'trigger/'
+
 
 def create_database(db_file):
     """ Create a database file based on SQLite """
@@ -67,3 +69,18 @@ def initialize_tables(connection):
             count += 1
             print(e)
     print("Error: " + str(count))
+
+    initialize_triggers(connection=connection)
+
+
+def initialize_triggers(connection):
+    c = connection.cursor()
+    onlyfiles = [f for f in os.listdir(TRIGGER_DIR)]
+    for file in onlyfiles:
+        with open(TRIGGER_DIR + file, 'r') as myFile:
+            query = myFile.read()
+            try:
+                c.executescript(query)
+                print(f"> Trigger {file} added")
+            except Error as e:
+                print(e)

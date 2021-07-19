@@ -89,5 +89,5 @@ def import_temp_data(connection):
 
 if __name__ == '__main__':
     connection = create_connection(DATABASE)
-    execute_query(connection=connection, query='remove_user_pro', inputs=['3'])
     connection.close()
+    init()
