@@ -42,7 +42,7 @@ dml_queries = {
     "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}},
     "remove_special_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': None}},
     "remove_tag": {'list': UPDATE_QUERIES, 'params': {'tag_id': 0}},
-    "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
+    "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0, 'offset': 0}},
     "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None, 'key': None, 'offset': 0}},
     "get_movie_creators": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
@@ -59,6 +59,7 @@ dml_queries = {
     "user_watch_special": {'list': REQUEST_QUERIES, 'params': {'pro_id': None}},
     "user_watch": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_number_of_users": {'list': REQUEST_QUERIES, 'params': {}},
+    "get_number_of_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_number_of_movies": {'list': REQUEST_QUERIES, 'params': {}},
     "get_number_of_search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None}},
     "get_number_of_search_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tname': None, 'pattern': None}},
@@ -435,6 +436,54 @@ def search_by_tag(connection, tags, choosed_tags, pattern, offset):
     return (list(dict.fromkeys(data)), total)
 
 
+def select_this_movie(connection, data):
+    """
+    This method selects a movie for our user.
+    """
+    flag = execute_get_query(connection=connection, query="is_special_movie", inputs=[data[0]])
+    creators = execute_get_query(connection=connection, query="get_movie_creators", inputs=[data[0]])
+    tags = execute_get_query(connection=connection, query="get_movie_tags", inputs=[data[0]])
+    offset = 0
+    while True:
+        total = execute_get_query(connection=connection, query="get_number_of_comments", inputs=[data[0]])
+        if total:
+            total = total[0][0]
+        else:
+            total = 0
+        comments = execute_get_query(connection=connection, query="get_comments", inputs=[data[0], offset])
+        clearScreen()
+        print(data)
+        if creators:
+            print("Movie creator:")
+            printData(creators[0])
+        if tags:
+            print("Movie tags:")
+            printData(tags[0])
+        if flag:
+            print(f'Price: {flag[0][2]}$')
+        if comments:
+            print("Movie Comments:")
+            printData(comments[0])
+        show_menu(USER_MOVIE_NAV)
+        command = input("> ")
+        if command == "1":
+            if offset + VIEW_LIMIT < total:
+                offset += VIEW_LIMIT
+        elif command == "2":
+            if offset - VIEW_LIMIT >= 0:
+                offset -= VIEW_LIMIT
+        elif command == "3":
+            pass # watch
+        elif command == "4":
+            pass # comment
+        elif command == "5":
+            pass # add to a list
+        elif command == "6":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def user_search_panel(connection):
     """
     User search panel lets the user to search in movies
@@ -483,7 +532,8 @@ def user_search_panel(connection):
             if offset - VIEW_LIMIT >= 0:
                 offset -= VIEW_LIMIT
         elif command == "3":
-            pass # todo: Select
+            index = input("Which one ?> ")
+            select_this_movie(connection=connection, data=data[int(index)-1])
         elif command == "4":
             break
         else:
