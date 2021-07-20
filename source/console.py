@@ -19,6 +19,7 @@ ADMIN_SELECT_MOVIE_SPECIAL = {'1': 'Edit', '2': 'Delete', '3': 'Remove From Spec
 ADMIN_TAG_NAV = {'1': 'Insert', '2': 'Remove', '3': 'Back'}
 
 def show_menu(dic):
+    print("\n&$C======C$&")
     for key in dic.keys():
         print(f'{key}. {dic[key]}')
     print()

@@ -1,5 +1,4 @@
 from sqlite3 import Error
-from types import coroutine
 from createDB import create_connection, create_database, initialize_tables
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUERIES
 from import_data import load_data
@@ -418,7 +417,17 @@ def admin_panel(connection):
 
 
 def user_panel(connection):
-    pass # todo: User can: watch movie, increase wallet, comment, make list, add to list, remove from list, view movies, view lists, and go pro
+    # todo: User can: watch movie, increase wallet, comment, make list, add to list, remove from list, view movies, view lists, and go pro
+    # todo: Create a search panel to search movie, by name, tag, list name
+    # todo: Create a wallet panel, where user can charge its wallet
+    # todo: Create a watch panel, where user can see its watched movies
+    # todo: Create a movie panel like admin, so user can view an comment ( implement it in search panel )
+    # todo: Create a panel where user can see its status about being pro
+    # todo: Create a list panel, where user and create and modify list
+    pass
+
+# todo: Create a trigger for pro check
+
 
 
 def login(connection):
