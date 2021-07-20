@@ -556,6 +556,9 @@ def user_search_panel(connection):
 
 
 def user_watch_panel(connection):
+    """
+    This method shows the user the history of the user movies.
+    """
     data = execute_get_query(connection=connection, query="user_watch", inputs=[USERNAME])
     if data:
         print("Your history:")
@@ -564,6 +567,9 @@ def user_watch_panel(connection):
 
 
 def new_list(connection):
+    """
+    This method inserts a new list for a user.
+    """
     id = int(str(uuid.uuid1().int)[-16:])
     name = input("Enter name *> ")
     if name == "":
@@ -574,17 +580,29 @@ def new_list(connection):
 
 
 def add_movie_to_list(connection, movie_id, list_id):
+    """
+    Add a specific movie to user list.
+    """
     execute_query(connection=connection, query="insert_movie_in_list", inputs=[movie_id, list_id])
 
 
 def remove_list(connection, list_id):
+    """
+    Remove a full list.
+    """
     execute_query(connection=connection, query="remove_list", inputs=[list_id])
 
 def remove_movie_from_list(connection, list_id, movie_id):
+    """
+    Remove a single movie from a list.
+    """
     execute_query(connection=connection, query="remove_movie_from_list", inputs=[movie_id, list_id])
 
 
 def view_list(connection, data, movie_id=None):
+    """
+    View list is the method to send the user into the list view panel.
+    """
     while True:
         clearScreen()
         movies = execute_get_query(connection=connection, query="get_movies_of_list", inputs=[data[0]])
@@ -616,6 +634,9 @@ def view_list(connection, data, movie_id=None):
 
 
 def user_list_panel(connection, movie_id=None):
+    """
+    User list panel is the panel that shows the user lists and their content.
+    """
     while True:
         clearScreen()
         data = execute_get_query(connection=connection, query="get_list", inputs=[USERNAME])
