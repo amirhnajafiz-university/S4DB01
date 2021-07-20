@@ -4,14 +4,17 @@ from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUER
 from import_data import load_data
 from console import *
 import uuid
+import os
 
 
 DEF_DIR = './database/'
 DATABASE = DEF_DIR + 'stream.db'
 USERNAME = None
+ISADMIN = False
 
 INPUT_ERROR = "Wrong input!"
 VIEW_LIMIT = 5
+SPLITTER = "==============================="
 
 dml_queries = {
     "insert_admin": {'list': INSERT_QUERIES, 'params': {'username': None, 'password': None}},
@@ -126,18 +129,41 @@ def import_temp_data(connection):
         execute_query(connection=connection, query=obj['op'], inputs=list(obj['data'].values()))
 
 
+def clearScreen():
+    """
+    Simple method for formatting the console.
+    """
+    os.system('cls' if os.name=='nt' else 'clear')
+    print(f"User {USERNAME} ", end="")
+    if ISADMIN:
+        print("As Admin\n")
+    else:
+        print("\n")
+    print(SPLITTER)
+
+
 def printData(data):
+    """
+    This method gets a list and prints it.
+    """
     index = 1
+    if len(data) > 0:
+        print(SPLITTER)
     for item in data:
         print(f"{index}. {item}")
         index += 1
+    if len(data) > 0:
+        print(SPLITTER)
 
 
 def view_users_panel(connection):
-    "This method shows all the users to admin"
-    offset = 0
-    total = execute_get_query(connection=connection, query="get_number_of_users", inputs=[])[0][0]
+    """
+    This method is the user viewing panel, for admin to check users.
+    """
+    offset = 0  # Creating an offset so the admin can view the data
     while True:
+        clearScreen()
+        total = execute_get_query(connection=connection, query="get_number_of_users", inputs=[])[0][0]  # Total number of records
         print(f"Total found: {total}")
         data = execute_get_query(connection=connection, query="get_users", inputs=[offset])
         printData(data=data)
@@ -156,6 +182,9 @@ def view_users_panel(connection):
 
 
 def edit_movie(connection, data):
+    """
+    This method runs the functionality of editing a movie.
+    """
     print("If you don't want to change a field, just press enter.")
     file = input("Movie file > ")
     if file == "":
@@ -173,8 +202,11 @@ def edit_movie(connection, data):
 
 
 def add_movie(connection):
+    """
+    This method runs the functionality of inserting a new movie.
+    """
     print("If you don't want to give non require fields a value, just press enter.")
-    id = str(uuid.uuid1().int)
+    id = str(uuid.uuid1().int)  # Generate an id for the movie
     file = input("Movie file * > ")
     if file == "":
         while file != "":
@@ -209,6 +241,7 @@ def add_movie(connection):
     if flag == "Y":
         price = int(input("Enter price > "))
     if execute_query(connection=connection, query="insert_movie", inputs=[id, file, name, year, description]):
+        # TODO: Make this a single transaction
         if tags:
             for tag in tags:
                 execute_query(connection=connection, query="insert_movie_tag", inputs=[data[int(tag)][0], id])
@@ -219,10 +252,14 @@ def add_movie(connection):
 
 
 def view_movie(connection, data):
+    """
+    This method sends the admin to a single movie viewing.
+    """
     flag = execute_get_query(connection=connection, query="is_special_movie", inputs=[data[0]])
     creators = execute_get_query(connection=connection, query="get_movie_creators", inputs=[data[0]])
     tags = execute_get_query(connection=connection, query="get_movie_tags", inputs=[data[0]])
     while True:
+        clearScreen()
         print(data)
         if creators:
             print("Movie creator:")
@@ -256,9 +293,13 @@ def view_movie(connection, data):
 
 
 def view_movies_panel(connection):
+    """
+    This method generates the view port of movies for admin to navigate.
+    """
     offset = 0
-    total = execute_get_query(connection=connection, query="get_number_of_movies", inputs=[])[0][0]
     while True:
+        clearScreen()
+        total = execute_get_query(connection=connection, query="get_number_of_movies", inputs=[])[0][0]
         print(f"Total found: {total}")
         data = execute_get_query(connection=connection, query="get_movies", inputs=[offset])
         printData(data=data)
@@ -282,7 +323,11 @@ def view_movies_panel(connection):
 
 
 def view_tags(connection):
+    """
+    This method generates the view of tag modifying panel for admin.
+    """
     while True:
+        clearScreen()
         data = execute_get_query(connection=connection, query="get_tags", inputs=[])
         if data:
             data = data
@@ -306,8 +351,11 @@ def view_tags(connection):
 
 
 def admin_panel(connection):
-    # todo: Admin can: add movie, remove movie, add a tag, remove a tag, change a tag, add special movie, remove special movie, edit movie, view users, view movies, view lists
+    """
+    Admin panel routes the admin to different parts of the admin panel.
+    """
     while True:
+        clearScreen()
         show_menu(ADMIN)
         command = input("> ")
         if command == '1':
@@ -330,18 +378,19 @@ def login(connection):
     """
     Login panel where the user enters username and password and we check the information.
     """
+    global USERNAME, ISADMIN
     data = {}
     data['username'] = "amirhossein" # input("> Enter Username: ")
     data['password'] = "1270" # input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
+        ISADMIN = True
         admin_panel(connection=connection)
     result = execute_get_query(connection=connection, query='user_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
         user_panel(connection=connection)
-    print("Login faild.")
 
 
 def sign_up(connection):
@@ -370,8 +419,12 @@ def sign_up(connection):
 
 
 def root():
+    """
+    root is our project main function that starts the application.
+    """
     connection = create_connection(DATABASE)
     while True:
+        os.system('cls' if os.name=='nt' else 'clear')
         show_menu(START)
         command = input("> ")
         if command == '1':
