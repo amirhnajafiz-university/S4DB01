@@ -15,6 +15,9 @@ USERNAME = None
 ISADMIN = False
 PRO_ID = None
 
+ERROR_MESSAGE = None
+ERROR = False
+
 INPUT_ERROR = "Wrong input!"
 VIEW_LIMIT = 5
 SPLITTER = "==============================="
@@ -99,10 +102,18 @@ def execute_delete(connection, query):
         connection.rollback()
 
 
+def reset(connection):
+    """
+    This method resets the database.
+    """
+    execute_delete(connection=connection, query="delete_tables")
+
+
 def execute_query(connection, query, inputs, allow_commit=True, disable_transation=False):
     """
     This method executes a query that is insert or update.
     """
+    global ERROR_MESSAGE, ERROR
     try:
         c = connection.cursor()
         if not disable_transation:
@@ -111,8 +122,11 @@ def execute_query(connection, query, inputs, allow_commit=True, disable_transati
         if allow_commit:
             c.execute("COMMIT;")
             print("> Commited")
+        ERROR = False
         return True
     except Error as e:
+        ERROR_MESSAGE = e
+        ERROR = True
         print(e)
         c.execute("ROLLBACK")
         return False
@@ -127,7 +141,10 @@ def execute_get_query(connection, query, inputs):
         c = connection.cursor()
         c.execute(dml_queries[query]['list'][query], list(inputs))
         data = c.fetchall()
+        ERROR = False
     except Error as e:
+        ERROR_MESSAGE = e
+        ERROR = True
         print(e)
     finally:
         return data
@@ -146,7 +163,7 @@ def clearScreen():
     """
     Simple method for formatting the console.
     """
-    # os.system('cls' if os.name=='nt' else 'clear')
+    os.system('cls' if os.name=='nt' else 'clear')
     print(f"User {USERNAME} ", end="")
     if ISADMIN:
         print("As Admin\n")
@@ -733,7 +750,7 @@ def update_credit(connection, ex_date):
     """
     if execute_query(connection=connection, query="modify_wallet", inputs=[-50, USERNAME], allow_commit=False):
         new_date = parser.parse(ex_date) + datetime.timedelta(days=30)
-        if execute_query(connection=connection, query="update_credit", inputs=[new_date, PRO_ID]):
+        if execute_query(connection=connection, query="update_credit", inputs=[new_date, PRO_ID], disable_transation=True):
             connection.commit()
         else:
             connection.rollback()

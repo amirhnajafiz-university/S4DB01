@@ -1,3 +1,5 @@
+from main import ERROR, ERROR_MESSAGE
+
 # Starting menue
 START = {'1': 'Login', '2': 'Sign Up', '3': 'Close'}  
 # User abilities
@@ -17,6 +19,8 @@ ADMIN_SELECT_MOVIE_SPECIAL = {'1': 'Edit', '2': 'Delete', '3': 'Remove From Spec
 ADMIN_TAG_NAV = {'1': 'Insert', '2': 'Remove', '3': 'Back'}
 
 def show_menu(dic):
+    if ERROR:
+        print("Error: " + ERROR_MESSAGE)
     print()
     for key in dic.keys():
         print(f'{key}. {dic[key]}')
