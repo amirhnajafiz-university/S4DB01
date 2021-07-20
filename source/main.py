@@ -1,4 +1,3 @@
-from os import replace
 from sqlite3 import Error
 from createDB import create_connection, create_database, initialize_tables
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUERIES
@@ -93,6 +92,9 @@ def execute_query(connection, query, inputs):
 
 
 def execute_get_query(connection, query, inputs):
+    """
+    This method executes type of queries that return a data from database.
+    """
     data = None
     try:
         c = connection.cursor()
@@ -113,7 +115,18 @@ def import_temp_data(connection):
         execute_query(connection=connection, query=obj['op'], inputs=list(obj['data'].values()))
 
 
+def admin_panel(connection):
+    pass # todo: Admin can: add movie, remove movie, add a tag, remove a tag, change a tag, add special movie, remove special movie, edit movie, view users, view movies, view lists
+
+
+def user_panel(connection):
+    pass # todo: User can: watch movie, increase wallet, comment, make list, add to list, remove from list, view movies, view lists, and go pro
+
+
 def login(connection):
+    """
+    Login panel where the user enters username and password and we check the information.
+    """
     data = {}
     data['username'] = input("> Enter Username: ")
     data['password'] = input("> Enter Password: ")
@@ -123,11 +136,13 @@ def login(connection):
     result = execute_get_query(connection=connection, query='user_login', inputs=data.values())
     if result:
         print("User")
-
     print("Not found.")
 
 
 def sign_up(connection):
+    """
+    Sign up panel where each new user enters its information to register.
+    """
     data = {}
     data['username'] = input("> Enter Username: ")
     data['password'] = input("> Enter Password: ")
