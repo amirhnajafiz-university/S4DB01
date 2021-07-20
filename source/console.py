@@ -12,10 +12,10 @@ CHARGE_WALLET = {'1': 'Pay', '2': 'Cancel'}
 EDIT_PROFILE = {'1': 'Password', '2': 'Phone Number', '3': 'Email', '4': 'Close'}
 # Admin abilities
 ADMIN = {'1': 'Users', '2': 'Movies', '3': 'Lists', '4': 'Exit'}
-ADMIN_MOVIE = {'1': 'Next', '2': 'Prev' ,'3': 'Back'}
-ADMIN_SELECT_MOVIE = {'1': 'Edit', '2': 'Delete', '3': 'Close'}
-ADMIN_USER = {'1': 'Search', '2': 'View All', '3': 'View Specials', '4': 'Back'}
-ADMIN_SELECT_USER = {'1': 'View', '2': 'Delete', '3': 'Close'}
+ADMIN_USER_NAV = {'1': 'Next', '2': 'Prev' ,'3': 'Back'}
+ADMIN_MOVIE_NAV = {'1': 'Next', '2': 'Prev' , '3': 'Select', '4': 'Back'}
+ADMIN_SELECT_MOVIE = {'1': 'Edit', '2': 'Delete', '3': 'Mark Special', '4': 'Close'}
+ADMIN_SELECT_MOVIE_SPECIAL = {'1': 'Edit', '2': 'Delete', '3': 'Remove From Special', '4': 'Close'}
 
 def show_menu(dic):
     for key in dic.keys():

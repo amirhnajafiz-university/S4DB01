@@ -1,0 +1,4 @@
+SELECT DISTINCT *
+FROM "movie"
+LIMIT 5
+OFFSET ?;

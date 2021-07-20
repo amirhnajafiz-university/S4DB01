@@ -43,7 +43,7 @@ dml_queries = {
     "get_movies_of_list": {'list': REQUEST_QUERIES, 'params': {'list_id': 0}},
     "get_tags": {'list': REQUEST_QUERIES, 'params': {'name': None}},
     "admin_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
-    "search_movie": {'list': REQUEST_QUERIES, 'params': {'key': None, 'value': None}},
+    "get_movies": {'list': REQUEST_QUERIES, 'params': {'offset': 0}},
     "get_users": {'list': REQUEST_QUERIES, 'params': {'offset': 0}},
     "special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "special_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
@@ -52,7 +52,10 @@ dml_queries = {
     "user_wallet": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "user_watch_special": {'list': REQUEST_QUERIES, 'params': {'pro_id': None}},
     "user_watch": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "get_number_of_users": {'list': REQUEST_QUERIES, 'params': {}}
+    "get_number_of_users": {'list': REQUEST_QUERIES, 'params': {}},
+    "get_number_of_movies": {'list': REQUEST_QUERIES, 'params': {}},
+    "get_movie_tags": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
+    "is_special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
 }
 
 
@@ -128,13 +131,14 @@ def printData(data):
 
 
 def view_users_panel(connection):
+    "This method shows all the users to admin"
     offset = 0
     total = execute_get_query(connection=connection, query="get_number_of_users", inputs=[])[0][0]
     while True:
         print(f"Total found: {total}")
         data = execute_get_query(connection=connection, query="get_users", inputs=[offset])
         printData(data=data)
-        show_menu(ADMIN_MOVIE)
+        show_menu(ADMIN_USER_NAV)
         command = input("> ")
         if command == "1":
             if offset + VIEW_LIMIT < total:
@@ -148,6 +152,59 @@ def view_users_panel(connection):
             print(INPUT_ERROR)
 
 
+def view_movie(connection, data):
+    flag = execute_get_query(connection=connection, query="is_special_movie", inputs=[data[0]])
+    creators = execute_get_query(connection=connection, query="get_movie_creators", inputs=[data[0]])
+    tags = execute_get_query(connection=connection, query="get_movie_tags", inputs=[data[0]])
+    while True:
+        print(data)
+        if creators:
+            print(creators[0])
+        if tags:
+            print(tags[0])
+        if flag:
+            print("* Special Movie")
+            show_menu(ADMIN_SELECT_MOVIE_SPECIAL)
+        else:
+            show_menu(ADMIN_SELECT_MOVIE)
+        command = input("> ")
+        if command == "1":
+            pass # todo: edit
+        elif command == "2":
+            pass # todo: remove
+        elif command == "3":
+            pass # todo: Add or remove special
+        elif command == "4":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
+
+def view_movies_panel(connection):
+    offset = 0
+    total = execute_get_query(connection=connection, query="get_number_of_movies", inputs=[])[0][0]
+    while True:
+        print(f"Total found: {total}")
+        data = execute_get_query(connection=connection, query="get_movies", inputs=[offset])
+        printData(data=data)
+        show_menu(ADMIN_MOVIE_NAV)
+        command = input("> ")
+        if command == "1":
+            if offset + VIEW_LIMIT < total:
+                offset += VIEW_LIMIT
+        elif command == "2":
+            if offset - VIEW_LIMIT >= 0:
+                offset -= VIEW_LIMIT
+        elif command == "3":
+            code = int(input("Which one ?> "))
+            view_movie(connection, data[code])
+        elif command == "4":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def admin_panel(connection):
     # todo: Admin can: add movie, remove movie, add a tag, remove a tag, change a tag, add special movie, remove special movie, edit movie, view users, view movies, view lists
     while True:
@@ -156,7 +213,7 @@ def admin_panel(connection):
         if command == '1':
             view_users_panel(connection=connection)
         elif command == '2':
-            pass # movies panel
+            view_movies_panel(connection=connection)
         elif command == '3':
             pass # view lists panel
         elif command == '4':
