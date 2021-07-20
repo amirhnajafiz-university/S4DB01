@@ -3,6 +3,7 @@ from createDB import create_connection, create_database, initialize_tables
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUERIES
 from import_data import load_data
 from console import *
+import uuid
 
 
 DEF_DIR = './database/'
@@ -20,7 +21,7 @@ dml_queries = {
     "insert_movie_in_list": {'list': INSERT_QUERIES, 'params': {'special_id': 0, 'movie_id': 0, 'list_id': 0}},
     "insert_movie_tag": {'list': INSERT_QUERIES, 'params': {'tag_id': None, 'movie_id': None}},
     "insert_movie": {'list': INSERT_QUERIES, 'params': {'movie_id': None, 'movie_file': None, 'name': None, 'movie_year': None, 'description': None}},
-    "insert_special_movie": {'list': INSERT_QUERIES, 'params': {'movie_id': None, 'price': None}},
+    "insert_special_movie": {'list': INSERT_QUERIES, 'params': {'special_id': None, 'movie_id': None, 'price': None}},
     "insert_special_user": {'list': INSERT_QUERIES, 'params': {'pro_id': 0, 'username': None, 'expiredate': None}},
     "insert_tag": {'list': INSERT_QUERIES, 'params': {'tag_id': None, 'name': None}},
     "insert_user": {'list': INSERT_QUERIES, 'params': {'username': None, 'password': None, 'name': None, 'email': None, 'phonenumber': None, 'nationalID': None, 'wallet': 0, 'point': 0, 'reference': None}},
@@ -42,7 +43,7 @@ dml_queries = {
     "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None}},
     "get_movie_creators": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_movies_of_list": {'list': REQUEST_QUERIES, 'params': {'list_id': 0}},
-    "get_tags": {'list': REQUEST_QUERIES, 'params': {'name': None}},
+    "get_tags": {'list': REQUEST_QUERIES, 'params': {}},
     "admin_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
     "get_movies": {'list': REQUEST_QUERIES, 'params': {'offset': 0}},
     "get_users": {'list': REQUEST_QUERIES, 'params': {'offset': 0}},
@@ -170,6 +171,52 @@ def edit_movie(connection, data):
     execute_query(connection=connection, query="change_movie", inputs=[file, name, year, description, data[0]])
 
 
+def add_movie(connection):
+    print("If you don't want to give non require fields a value, just press enter.")
+    id = str(uuid.uuid1().int)
+    file = input("Movie file * > ")
+    if file == "":
+        while file != "":
+            file = input("Movie file * > ")
+    name = input("Movie name * > ")
+    if name == "":
+        while name != "":
+            name = input("Movie name * > ")
+    year = int(input("Movie year * > "))
+    if year == "":
+        while year != "":
+            year = input("Movie year * > ")
+    description = input("Movie description > ")
+    if description == "":
+        description = None
+    print("Choose the tags you want for this movie: ")
+    data = execute_get_query(connection=connection, query="get_tags", inputs=[])
+    tags = None
+    if data:
+        data = data[0]
+        printData(data=data)
+        tags = input("Enter tags index like 1,2,... > ")
+        tags = tags.split(",")
+    print("Enter the movie creators: ")
+    creators = input("Enter like Adam,Martix,..... > ")
+    if creators == "":
+        creators = []
+    else:
+        creators = creators.split(",")
+    flag = input("Do you want this to be special movie ?(Y/n)> ")
+    price = 0
+    if flag == "Y":
+        price = int(input("Enter price > "))
+    if execute_query(connection=connection, query="insert_movie", inputs=[id, file, name, year, description]):
+        if tags:
+            for tag in tags:
+                execute_query(connection=connection, query="insert_movie_tag", inputs=[data[int(tag)][0], id])
+        for creator in creators:
+            execute_query(connection=connection, query="insert_creator", inputs=[creator, id])
+        if flag:
+            execute_query(connection=connection, query="insert_special_movie", inputs=[int(str(uuid.uuid1().int)[-16:]), id, price])
+
+
 def view_movie(connection, data):
     flag = execute_get_query(connection=connection, query="is_special_movie", inputs=[data[0]])
     creators = execute_get_query(connection=connection, query="get_movie_creators", inputs=[data[0]])
@@ -177,9 +224,11 @@ def view_movie(connection, data):
     while True:
         print(data)
         if creators:
-            print(creators[0])
+            print("Movie creator:")
+            printData(creators[0])
         if tags:
-            print(tags[0])
+            print("Movie tags:")
+            printData(tags[0])
         if flag:
             print("* Special Movie")
             show_menu(ADMIN_SELECT_MOVIE_SPECIAL)
@@ -197,13 +246,12 @@ def view_movie(connection, data):
                 execute_query(connection=connection, query="remove_special_movie", inputs=[data[0]])
             else:
                 price = int(input("Enter the price > "))
-                execute_query(connection=connection, query="insert_special_movie", inputs=[data[0], price])
+                execute_query(connection=connection, query="insert_special_movie", inputs=[int(str(uuid.uuid1().int)[-16:]), data[0], price])
             break
         elif command == "4":
             break
         else:
             print(INPUT_ERROR)
-
 
 
 def view_movies_panel(connection):
@@ -223,8 +271,10 @@ def view_movies_panel(connection):
                 offset -= VIEW_LIMIT
         elif command == "3":
             code = int(input("Which one ?> "))
-            view_movie(connection, data[code])
+            view_movie(connection, data[code-1])
         elif command == "4":
+            add_movie(connection=connection)
+        elif command == "5":
             break
         else:
             print(INPUT_ERROR)
@@ -240,7 +290,7 @@ def admin_panel(connection):
         elif command == '2':
             view_movies_panel(connection=connection)
         elif command == '3':
-            pass # view lists panel
+            pass # todo: tag modify
         elif command == '4':
             break
         else:

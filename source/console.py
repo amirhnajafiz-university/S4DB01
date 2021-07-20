@@ -11,9 +11,9 @@ SELECT_WATCH = {'1': 'Select', '2': 'Back'}
 CHARGE_WALLET = {'1': 'Pay', '2': 'Cancel'}
 EDIT_PROFILE = {'1': 'Password', '2': 'Phone Number', '3': 'Email', '4': 'Close'}
 # Admin abilities
-ADMIN = {'1': 'Users', '2': 'Movies', '3': 'Lists', '4': 'Exit'}
+ADMIN = {'1': 'Users', '2': 'Movies', '3': 'Tags', '4': 'Exit'}
 ADMIN_USER_NAV = {'1': 'Next', '2': 'Prev' ,'3': 'Back'}
-ADMIN_MOVIE_NAV = {'1': 'Next', '2': 'Prev' , '3': 'Select', '4': 'Back'}
+ADMIN_MOVIE_NAV = {'1': 'Next', '2': 'Prev' , '3': 'Select', '4': 'New Movie', '5': 'Back'}
 ADMIN_SELECT_MOVIE = {'1': 'Edit', '2': 'Delete', '3': 'Mark Special', '4': 'Close'}
 ADMIN_SELECT_MOVIE_SPECIAL = {'1': 'Edit', '2': 'Delete', '3': 'Remove From Special', '4': 'Close'}
 

@@ -1,3 +1,2 @@
 SELECT *
-FROM "tags"
-WHERE name = ?;
+FROM "tags";
