@@ -11,6 +11,7 @@ DEF_DIR = './database/'
 DATABASE = DEF_DIR + 'stream.db'
 USERNAME = None
 ISADMIN = False
+PRO_ID = None
 
 INPUT_ERROR = "Wrong input!"
 VIEW_LIMIT = 5
@@ -436,6 +437,19 @@ def search_by_tag(connection, tags, choosed_tags, pattern, offset):
     return (list(dict.fromkeys(data)), total)
 
 
+def watch_movie(connection, movie_id, is_special):
+    """
+    This method inserts a new watch for user.
+    """
+    query = "insert_watch"
+    id = USERNAME
+    if is_special:
+        query = "insert_watch_special"
+        id = PRO_ID
+    if not execute_query(connection=connection, query=query, inputs=[id, movie_id]):
+        print("Can't watch.")
+
+
 def select_this_movie(connection, data):
     """
     This method selects a movie for our user.
@@ -473,7 +487,7 @@ def select_this_movie(connection, data):
             if offset - VIEW_LIMIT >= 0:
                 offset -= VIEW_LIMIT
         elif command == "3":
-            pass # watch
+            watch_movie(connection=connection, movie_id=data[0], is_special=flag)
         elif command == "4":
             pass # comment
         elif command == "5":
@@ -540,6 +554,14 @@ def user_search_panel(connection):
             print(INPUT_ERROR)
 
 
+def user_watch_panel(connection):
+    data = execute_get_query(connection=connection, query="user_watch", inputs=[USERNAME])
+    if data:
+        print("Your history:")
+        printData(data=data)
+    input("Press enter to exit > ")
+
+
 def user_panel(connection):
     """
     User panel routes the user to different parts of the user panel
@@ -557,8 +579,7 @@ def user_panel(connection):
             # todo: Send to list panel - View Create Delete Modify
             pass
         elif command == '4':
-            # todo: View the list of watched movies
-            pass
+            user_watch_panel(connection=connection)
         elif command == '5':
             # todo: Send to chargin wallet
             pass 
@@ -581,7 +602,7 @@ def login(connection):
     """
     Login panel where the user enters username and password and we check the information.
     """
-    global USERNAME, ISADMIN
+    global USERNAME, ISADMIN, PRO_ID
     data = {}
     data['username'] = "user5" # input("> Enter Username: ")
     data['password'] = "p55555555" # input("> Enter Password: ")
@@ -593,6 +614,9 @@ def login(connection):
     result = execute_get_query(connection=connection, query='user_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
+        flag = execute_get_query(connection=connection, query="special_user", inputs=[USERNAME])
+        if flag:
+            PRO_ID = flag[0][0]
         user_panel(connection=connection)
 
 
