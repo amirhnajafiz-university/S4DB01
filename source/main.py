@@ -5,6 +5,8 @@ from import_data import load_data
 from console import *
 import uuid
 import os
+import datetime
+from dateutil import parser
 
 
 DEF_DIR = './database/'
@@ -44,6 +46,7 @@ dml_queries = {
     "remove_special_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': None}},
     "remove_tag": {'list': UPDATE_QUERIES, 'params': {'tag_id': 0}},
     "remove_list": {'list': UPDATE_QUERIES, 'params': {'list_id': 0}},
+    "update_credit": {'list': UPDATE_QUERIES, 'params': {'expiredate': None, 'pro_id': None}},
     "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0, 'offset': 0}},
     "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None, 'key': None, 'offset': 0}},
@@ -66,6 +69,7 @@ dml_queries = {
     "get_number_of_search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None}},
     "get_number_of_search_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tname': None, 'pattern': None}},
     "get_movie_tags": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
+    "get_current_credit": {'list': REQUEST_QUERIES, 'params': {'pro_id': 0}},
     "search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None, 'offset': 0}},
     "is_special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
 }
@@ -694,6 +698,48 @@ def password_change(connection):
             break
 
 
+def add_pro_user(connection):
+    """
+    This method adds a new user to the pro users list.
+    """
+    global PRO_ID
+    id = int(str(uuid.uuid1().int)[-16:])
+    ex_date = datetime.datetime.now() + datetime.timedelta(days=30)
+    if execute_query(connection=connection, query="insert_special_user", inputs=[id, USERNAME, ex_date]):
+        PRO_ID = id
+
+
+def update_credit(connection, ex_date):
+    """
+    This method updates the time credit for a special user.
+    """
+    new_date = parser.parse(ex_date) + datetime.timedelta(days=30)
+    execute_query(connection=connection, query="update_credit", inputs=[new_date, PRO_ID])
+
+
+def pro_panel(connection):
+    """
+    Pro panel represents the panel for showing the current status of pro user and updating status.
+    """
+    while True:
+        clearScreen()
+        if PRO_ID:
+            ex_date = execute_get_query(connection=connection, query="get_current_credit", inputs=[PRO_ID])[0][0]
+            print(f"You are a pro user until {ex_date}")
+        else:
+            print("You are a normal user.")
+        show_menu(PRO_PANEL_NAVIGATION)
+        command = input("> ")
+        if command == "1":
+            if not PRO_ID:
+                add_pro_user(connection=connection)
+            else:
+                update_credit(connection=connection, ex_date=ex_date)
+        elif command == "2":
+            break
+        else:
+            print(INPUT_ERROR)
+
 
 def user_panel(connection):
     """
@@ -714,8 +760,7 @@ def user_panel(connection):
         elif command == '5':
             password_change(connection=connection)
         elif command == '6':
-            # todo: Send pro users
-            pass
+            pro_panel(connection=connection)
         elif command == '7':
             break
         else:

@@ -7,7 +7,7 @@ USER_MOVIE_NAV = {'1': 'Next', '2': 'Prev', '3': 'Watch', '4': 'Comment', '5': '
 USER_LIST_NAV = {'1': 'Select', '2': 'New', '3': 'Back'}
 IN_LIST_NAV = {'1': 'Select', '2': 'Add current movie', '3': 'Remove movie', '4': 'Delete list', '5': 'Close'}
 CHARGE_WALLET = {'1': 'Pay', '2': 'Cancel'}
-EDIT_PROFILE = {'1': 'Password', '2': 'Phone Number', '3': 'Email', '4': 'Close'}
+PRO_PANEL_NAVIGATION = {'1': 'Buy Credit', '2': 'Cancel'}
 # Admin abilities
 ADMIN = {'1': 'Users', '2': 'Movies', '3': 'Tags', '4': 'Exit'}
 ADMIN_USER_NAV = {'1': 'Next', '2': 'Prev' ,'3': 'Back'}

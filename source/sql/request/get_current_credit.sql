@@ -1,0 +1,1 @@
+SELECT expiredate FROM "special_user" WHERE pro_id = ?;

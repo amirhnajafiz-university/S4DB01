@@ -1,2 +1,2 @@
-INSERT INTO special_user (pro_id, expiredate)
-    VALUES(?, ?);
+INSERT INTO special_user (pro_id, username, expiredate)
+    VALUES(?, ?, ?);
