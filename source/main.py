@@ -1,4 +1,5 @@
 from sqlite3 import Error
+from types import coroutine
 from createDB import create_connection, create_database, initialize_tables
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUERIES
 from import_data import load_data
@@ -88,16 +89,18 @@ def execute_delete(connection, query):
         connection.rollback()
 
 
-def execute_query(connection, query, inputs):
+def execute_query(connection, query, inputs, allow_commit=True, disable_transation=False):
     """
     This method executes a query that is insert or update.
     """
     try:
         c = connection.cursor()
-        c.execute("BEGIN TRANSACTION;")
+        if not disable_transation:
+            c.execute("BEGIN TRANSACTION;")
         c.execute(dml_queries[query]['list'][query], inputs)
-        c.execute("COMMIT;")
-        print("> Commited")
+        if allow_commit:
+            c.execute("COMMIT;")
+            print("> Commited")
         return True
     except Error as e:
         print(e)
@@ -133,7 +136,7 @@ def clearScreen():
     """
     Simple method for formatting the console.
     """
-    os.system('cls' if os.name=='nt' else 'clear')
+    # os.system('cls' if os.name=='nt' else 'clear')
     print(f"User {USERNAME} ", end="")
     if ISADMIN:
         print("As Admin\n")
@@ -150,7 +153,34 @@ def printData(data):
     if len(data) > 0:
         print(SPLITTER)
     for item in data:
-        print(f"{index}. {item}")
+        print(f"{index}. {item}\n")
+        index += 1
+    if len(data) > 0:
+        print(SPLITTER)
+
+
+def calculate_page(offset, total):
+    """
+    This method simply gets the status of paging for us.
+    """
+    pages = int(total / VIEW_LIMIT) + 1
+    current = int(offset / VIEW_LIMIT) + 1
+    return (current, pages)
+
+
+def printMovies(connection, data):
+    """
+    This method print the movies.
+    """
+    index = 1
+    if len(data) > 0:
+        print(SPLITTER)
+    for item in data:
+        print(f'{index}. {item}', end="")
+        if execute_get_query(connection=connection, query="is_special_movie", inputs=[item[0]]):
+            print(" => Special\n")
+        else:
+            print("\n")
         index += 1
     if len(data) > 0:
         print(SPLITTER)
@@ -167,6 +197,8 @@ def view_users_panel(connection):
         print(f"Total found: {total}")
         data = execute_get_query(connection=connection, query="get_users", inputs=[offset])
         printData(data=data)
+        status = calculate_page(offset=offset, total=total)
+        print(f"\nPage {status[0]} of {status[1]}\n")
         show_menu(ADMIN_USER_NAV)
         command = input("> ")
         if command == "1":
@@ -229,7 +261,10 @@ def add_movie(connection):
         print("Tags: ")
         printData(data=data)
         tags = input("Enter tags index like 1,2,... > ")
-        tags = tags.split(",")
+        if tags == "":
+            tags = []
+        else:
+            tags = tags.split(",")
     print("Enter the movie creators: ")
     creators = input("Enter like Adam,Martix,..... > ")
     if creators == "":
@@ -240,15 +275,25 @@ def add_movie(connection):
     price = 0
     if flag == "Y":
         price = int(input("Enter price > "))
-    if execute_query(connection=connection, query="insert_movie", inputs=[id, file, name, year, description]):
-        # TODO: Make this a single transaction
-        if tags:
-            for tag in tags:
-                execute_query(connection=connection, query="insert_movie_tag", inputs=[data[int(tag)][0], id])
-        for creator in creators:
-            execute_query(connection=connection, query="insert_creator", inputs=[creator, id])
-        if flag:
-            execute_query(connection=connection, query="insert_special_movie", inputs=[int(str(uuid.uuid1().int)[-16:]), id, price])
+    code = []
+    try:  # Starting transaction
+        if execute_query(connection=connection, query="insert_movie", inputs=[id, file, name, year, description], allow_commit=False):
+            if tags:
+                for tag in tags:
+                    code.append(execute_query(connection=connection, query="insert_movie_tag", inputs=[data[int(tag)-1][0], id], allow_commit=False, disable_transation=True))
+            for creator in creators:
+                code.append(execute_query(connection=connection, query="insert_creator", inputs=[creator, id], allow_commit=False, disable_transation=True))
+            if flag == "Y":
+                code.append(execute_query(connection=connection, query="insert_special_movie", inputs=[int(str(uuid.uuid1().int)[-16:]), id, price], allow_commit=False, disable_transation=True))
+            for single in code:
+                if not single:
+                    connection.rollback()
+                    print("Rollback")
+                    return
+            connection.commit()
+    except Exception as e:
+        print(e)
+        connection.rollback()
 
 
 def view_movie(connection, data):
@@ -268,7 +313,7 @@ def view_movie(connection, data):
             print("Movie tags:")
             printData(tags[0])
         if flag:
-            print("* Special Movie")
+            print(f'Price: {flag[0][2]}$')
             show_menu(ADMIN_SELECT_MOVIE_SPECIAL)
         else:
             show_menu(ADMIN_SELECT_MOVIE)
@@ -302,7 +347,9 @@ def view_movies_panel(connection):
         total = execute_get_query(connection=connection, query="get_number_of_movies", inputs=[])[0][0]
         print(f"Total found: {total}")
         data = execute_get_query(connection=connection, query="get_movies", inputs=[offset])
-        printData(data=data)
+        printMovies(connection=connection, data=data)
+        status = calculate_page(offset=offset, total=total)
+        print(f"\nPage {status[0]} of {status[1]}\n")
         show_menu(ADMIN_MOVIE_NAV)
         command = input("> ")
         if command == "1":

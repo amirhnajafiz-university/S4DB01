@@ -21,3 +21,4 @@ ADMIN_TAG_NAV = {'1': 'Insert', '2': 'Remove', '3': 'Back'}
 def show_menu(dic):
     for key in dic.keys():
         print(f'{key}. {dic[key]}')
+    print()
