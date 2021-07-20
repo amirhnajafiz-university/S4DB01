@@ -658,6 +658,32 @@ def user_list_panel(connection, movie_id=None):
             print(INPUT_ERROR)
 
 
+def pay_money(connection, amount):
+    """
+    This method allows the user to charge its account.
+    """
+    execute_query(connection=connection, query="modify_wallet", inputs=[amount, USERNAME])
+
+
+def user_pay_panel(connection):
+    """
+    This method views the user wallet panel.
+    """
+    while True:
+        clearScreen()
+        current = execute_get_query(connection=connection, query="user_wallet", inputs=[USERNAME])
+        print(f"Your current wallet is  {current[0][0]} $")
+        show_menu(CHARGE_WALLET)
+        command = input("> ")
+        if command == "1":
+            amount = input("How mush ?> ")
+            pay_money(connection=connection, amount=amount)
+        elif command == "2":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def user_panel(connection):
     """
     User panel routes the user to different parts of the user panel
@@ -673,8 +699,7 @@ def user_panel(connection):
         elif command == '3':
             user_watch_panel(connection=connection)
         elif command == '4':
-            # todo: Send to chargin wallet
-            pass 
+            user_pay_panel(connection=connection)
         elif command == '5':
             # todo: Send to change profile panel
             pass
