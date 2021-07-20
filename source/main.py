@@ -70,6 +70,7 @@ dml_queries = {
     "get_number_of_search_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tname': None, 'pattern': None}},
     "get_movie_tags": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
     "get_current_credit": {'list': REQUEST_QUERIES, 'params': {'pro_id': 0}},
+    "get_average_rate": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None, 'offset': 0}},
     "is_special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
 }
@@ -474,6 +475,7 @@ def select_this_movie(connection, data):
     offset = 0
     while True:
         total = execute_get_query(connection=connection, query="get_number_of_comments", inputs=[data[0]])
+        average = execute_get_query(connection=connection, query="get_average_rate", inputs=[data[0]])
         if total:
             total = total[0][0]
         else:
@@ -489,6 +491,7 @@ def select_this_movie(connection, data):
             printData(tags)
         if flag:
             print(f'Price: {flag[0][2]}$')
+        print(f"Average rate by users {average[0][0]}.")
         if comments:
             print("Movie Comments:")
             printData(comments)
