@@ -67,7 +67,7 @@
         "op": "insert_user",
         "data": {
             "username": "user1",
-            "password": "p1",
+            "password": "p11111111",
             "name": "Amir",
             "email": "mail1",
             "phonenumber": "993823122",
@@ -80,7 +80,7 @@
         "op": "insert_user",
         "data": {
             "username": "user2",
-            "password": "p2",
+            "password": "p22222222",
             "name": "Hossein",
             "email": "mail2",
             "phonenumber": "993823122",
@@ -93,7 +93,7 @@
         "op": "insert_user",
         "data": {
             "username": "user3",
-            "password": "p3",
+            "password": "p33333333",
             "name": "Amir",
             "email": "mail3",
             "phonenumber": "993823122",
@@ -106,7 +106,7 @@
         "op": "insert_user",
         "data": {
             "username": "user4",
-            "password": "p4",
+            "password": "p44444444",
             "name": "Ali",
             "email": "mail4",
             "phonenumber": "993823122",
@@ -119,7 +119,7 @@
         "op": "insert_user",
         "data": {
             "username": "user5",
-            "password": "p5",
+            "password": "p55555555",
             "name": "Mansoor",
             "email": "mail5",
             "phonenumber": "9123122",
@@ -132,7 +132,7 @@
         "op": "insert_user",
         "data": {
             "username": "user6",
-            "password": "p6",
+            "password": "p66666666",
             "name": "Hesam",
             "email": "mail6",
             "phonenumber": "9938219822",

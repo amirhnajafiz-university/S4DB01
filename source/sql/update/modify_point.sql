@@ -1,1 +1,1 @@
-UPDATE "user" SET point = ? WHERE username = ?;
+UPDATE "user" SET point = point + ? WHERE username = ?;

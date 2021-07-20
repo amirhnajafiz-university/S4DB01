@@ -1,3 +1,4 @@
+from os import replace
 from sqlite3 import Error
 from createDB import create_connection, create_database, initialize_tables
 from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUERIES
@@ -38,7 +39,7 @@ dml_queries = {
     "get_movie_creators": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_movies_of_list": {'list': REQUEST_QUERIES, 'params': {'list_id': 0}},
     "get_tags": {'list': REQUEST_QUERIES, 'params': {'name': None}},
-    "search_admin": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
+    "admin_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
     "search_movie": {'list': REQUEST_QUERIES, 'params': {'key': None, 'value': None}},
     "search_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
@@ -80,12 +81,27 @@ def execute_query(connection, query, inputs):
     """
     try:
         c = connection.cursor()
+        c.execute("BEGIN TRANSACTION;")
         c.execute(dml_queries[query]['list'][query], inputs)
-        connection.commit()
+        c.execute("COMMIT;")
         print("> Commited")
+        return True
     except Error as e:
         print(e)
-        connection.rollback()
+        c.execute("ROLLBACK")
+        return False
+
+
+def execute_get_query(connection, query, inputs):
+    data = None
+    try:
+        c = connection.cursor()
+        c.execute(dml_queries[query]['list'][query], list(inputs))
+        data = c.fetchall()
+    except Error as e:
+        print(e)
+    finally:
+        return data
 
 
 def import_temp_data(connection):
@@ -97,7 +113,55 @@ def import_temp_data(connection):
         execute_query(connection=connection, query=obj['op'], inputs=list(obj['data'].values()))
 
 
+def login(connection):
+    data = {}
+    data['username'] = input("> Enter Username: ")
+    data['password'] = input("> Enter Password: ")
+    result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
+    if result:
+        print("Admin")
+    result = execute_get_query(connection=connection, query='user_login', inputs=data.values())
+    if result:
+        print("User")
+
+    print("Not found.")
+
+
+def sign_up(connection):
+    data = {}
+    data['username'] = input("> Enter Username: ")
+    data['password'] = input("> Enter Password: ")
+    data['name'] = input("> Enter Name: ")
+    data['email'] = input("> Enter Email: ")
+    data['phone'] = input("> Enter Phone Number: ")
+    data['ID'] = input("> Enter National ID: ")
+    data['wallet'] = 0
+    data['points'] = 0
+    data['reference'] = input("> If you were invited by a user enter their username, if not just press enter: ")
+    if execute_query(connection=connection, query='insert_user', inputs=data.values()):
+        execute_query(connection=connection, query='modify_point', inputs=[1, data['reference']])
+        print("User added.")
+    else:
+        print("User not added")
+        return
+
+
+def root():
+    connection = create_connection(DATABASE)
+    while True:
+        show_menu(START)
+        command = input("> ")
+        if command == '1':
+            login(connection=connection)
+        elif command == '2':
+            sign_up(connection=connection)
+        elif command == '3':
+            break
+        else:
+            print("Wrong input!")
+    connection.close()
+
+
 
 if __name__ == '__main__':
-    connection = create_connection(DATABASE)
-    connection.close()
+    root()
