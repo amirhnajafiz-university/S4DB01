@@ -455,6 +455,15 @@ def watch_movie(connection, movie_id, is_special):
         print("Can't watch.")
 
 
+def comment_this_movie(connection, movie_id):
+    """
+    This method comments a user opinion for a movie.
+    """
+    rate = int(input("Enter a rate between 0 to 5 > "))
+    comment = input("Enter your comment > ")
+    execute_query(connection=connection, query="insert_comment", inputs=[rate, comment, USERNAME, movie_id])
+
+
 def select_this_movie(connection, data):
     """
     This method selects a movie for our user.
@@ -474,16 +483,18 @@ def select_this_movie(connection, data):
         print(data)
         if creators:
             print("Movie creator:")
-            printData(creators[0])
+            printData(creators)
         if tags:
             print("Movie tags:")
-            printData(tags[0])
+            printData(tags)
         if flag:
             print(f'Price: {flag[0][2]}$')
         if comments:
             print("Movie Comments:")
-            printData(comments[0])
+            printData(comments)
         show_menu(USER_MOVIE_NAV)
+        status = calculate_page(offset=offset, total=total)
+        print(f"\nPage {status[0]} of {status[1]}\n")
         command = input("> ")
         if command == "1":
             if offset + VIEW_LIMIT < total:
@@ -494,7 +505,7 @@ def select_this_movie(connection, data):
         elif command == "3":
             watch_movie(connection=connection, movie_id=data[0], is_special=flag)
         elif command == "4":
-            pass # comment
+            comment_this_movie(connection=connection, movie_id=data[0])
         elif command == "5":
             user_list_panel(connection=connection, movie_id=data[0])
         elif command == "6":
@@ -703,18 +714,26 @@ def add_pro_user(connection):
     This method adds a new user to the pro users list.
     """
     global PRO_ID
-    id = int(str(uuid.uuid1().int)[-16:])
-    ex_date = datetime.datetime.now() + datetime.timedelta(days=30)
-    if execute_query(connection=connection, query="insert_special_user", inputs=[id, USERNAME, ex_date]):
-        PRO_ID = id
+    if execute_query(connection=connection, query="modify_wallet", inputs=[-50, USERNAME], allow_commit=False):
+        id = int(str(uuid.uuid1().int)[-16:])
+        ex_date = datetime.datetime.now() + datetime.timedelta(days=30)
+        if execute_query(connection=connection, query="insert_special_user", inputs=[id, USERNAME, ex_date], disable_transation=True):
+            PRO_ID = id
+            connection.commit()
+        else:
+            connection.rollback()
 
 
 def update_credit(connection, ex_date):
     """
     This method updates the time credit for a special user.
     """
-    new_date = parser.parse(ex_date) + datetime.timedelta(days=30)
-    execute_query(connection=connection, query="update_credit", inputs=[new_date, PRO_ID])
+    if execute_query(connection=connection, query="modify_wallet", inputs=[-50, USERNAME], allow_commit=False):
+        new_date = parser.parse(ex_date) + datetime.timedelta(days=30)
+        if execute_query(connection=connection, query="update_credit", inputs=[new_date, PRO_ID]):
+            connection.commit()
+        else:
+            connection.rollback()
 
 
 def pro_panel(connection):
@@ -768,7 +787,6 @@ def user_panel(connection):
 
 
 # todo: Create a trigger for pro check
-# todo: Create a trigger for update password
 
 
 def login(connection):

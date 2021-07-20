@@ -1,5 +1,5 @@
 SELECT * 
-FROM "comment" as C JOIN "movie" as M ON C.movie_id = M.movie_id
+FROM "comment"
 WHERE movie_id = ?
 LIMIT 5
 OFFSET ?;
