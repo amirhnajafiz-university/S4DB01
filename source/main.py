@@ -807,6 +807,9 @@ def user_panel(connection):
 
 
 # todo: Create a trigger for pro check
+# todo: Fix the watch and special watch
+# todo: Handle the point watching
+# todo: Add user other profile change
 
 
 def login(connection):
