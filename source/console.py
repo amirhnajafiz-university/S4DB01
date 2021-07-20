@@ -1,7 +1,7 @@
 # Starting menue
 START = {'1': 'Login', '2': 'Sign Up', '3': 'Close'}  
 # User abilities
-USER_NAV = {'1': 'Search Movie', '2': 'View your lists', '3': 'View your watches', '4': 'Charge wallet', '5': 'Edit profile', '6': 'Special Users', '7': 'Exit'}
+USER_NAV = {'1': 'Search Movie', '2': 'View your lists', '3': 'View your watches', '4': 'Charge wallet', '5': 'Edit password', '6': 'Special Users', '7': 'Exit'}
 USER_SEARCH_NAV = {'1': 'Next', '2': 'Prev', '3': 'Select', '4': 'Back'}
 USER_MOVIE_NAV = {'1': 'Next', '2': 'Prev', '3': 'Watch', '4': 'Comment', '5': 'Add to list', '6': 'Close'}
 USER_LIST_NAV = {'1': 'Select', '2': 'New', '3': 'Back'}

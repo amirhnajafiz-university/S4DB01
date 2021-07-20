@@ -684,6 +684,17 @@ def user_pay_panel(connection):
             print(INPUT_ERROR)
 
 
+def password_change(connection):
+    """
+    This method allows the user to change its password.
+    """
+    while True:
+        password = input("Enter the new password > ")
+        if execute_query(connection=connection, query="change_password", inputs=[password, USERNAME]):
+            break
+
+
+
 def user_panel(connection):
     """
     User panel routes the user to different parts of the user panel
@@ -701,10 +712,9 @@ def user_panel(connection):
         elif command == '4':
             user_pay_panel(connection=connection)
         elif command == '5':
-            # todo: Send to change profile panel
-            pass
+            password_change(connection=connection)
         elif command == '6':
-            # todo: Send to special users panel
+            # todo: Send pro users
             pass
         elif command == '7':
             break
@@ -713,6 +723,7 @@ def user_panel(connection):
 
 
 # todo: Create a trigger for pro check
+# todo: Create a trigger for update password
 
 
 def login(connection):
@@ -722,7 +733,7 @@ def login(connection):
     global USERNAME, ISADMIN, PRO_ID
     data = {}
     data['username'] = "user5" # input("> Enter Username: ")
-    data['password'] = "p55555555" # input("> Enter Password: ")
+    data['password'] = "45" # input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
