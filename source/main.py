@@ -21,7 +21,7 @@ dml_queries = {
     "insert_admin": {'list': INSERT_QUERIES, 'params': {'username': None, 'password': None}},
     "insert_comment": {'list': INSERT_QUERIES, 'params': {'rate': 0, 'user_comment': None, 'username': None, 'movie_id': None}},
     "insert_creator": {'list': INSERT_QUERIES, 'params': {'creator': None, 'movie_id': None}},
-    "insert_list": {'list': INSERT_QUERIES, 'params': {'list_id': 0,'username': None, 'name': None, 'description': None}},
+    "insert_list": {'list': INSERT_QUERIES, 'params': {'list_id': 0, 'username': None, 'name': None, 'description': None}},
     "insert_movie_in_list": {'list': INSERT_QUERIES, 'params': {'special_id': 0, 'movie_id': 0, 'list_id': 0}},
     "insert_movie_tag": {'list': INSERT_QUERIES, 'params': {'tag_id': None, 'movie_id': None}},
     "insert_movie": {'list': INSERT_QUERIES, 'params': {'movie_id': None, 'movie_file': None, 'name': None, 'movie_year': None, 'description': None}},
@@ -43,6 +43,7 @@ dml_queries = {
     "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}},
     "remove_special_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': None}},
     "remove_tag": {'list': UPDATE_QUERIES, 'params': {'tag_id': 0}},
+    "remove_list": {'list': UPDATE_QUERIES, 'params': {'list_id': 0}},
     "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0, 'offset': 0}},
     "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None, 'key': None, 'offset': 0}},
@@ -491,7 +492,7 @@ def select_this_movie(connection, data):
         elif command == "4":
             pass # comment
         elif command == "5":
-            pass # add to a list
+            user_list_panel(connection=connection, movie_id=data[0])
         elif command == "6":
             break
         else:
@@ -562,6 +563,80 @@ def user_watch_panel(connection):
     input("Press enter to exit > ")
 
 
+def new_list(connection):
+    id = int(str(uuid.uuid1().int)[-16:])
+    name = input("Enter name *> ")
+    if name == "":
+        while name != "":
+            name = input("Enter name *> ")
+    description = input("Description > ")
+    execute_query(connection=connection, query="insert_list", inputs=[id, USERNAME, name, description])
+
+
+def add_movie_to_list(connection, movie_id, list_id):
+    execute_query(connection=connection, query="insert_movie_in_list", inputs=[movie_id, list_id])
+
+
+def remove_list(connection, list_id):
+    execute_query(connection=connection, query="remove_list", inputs=[list_id])
+
+def remove_movie_from_list(connection, list_id, movie_id):
+    execute_query(connection=connection, query="remove_movie_from_list", inputs=[movie_id, list_id])
+
+
+def view_list(connection, data, movie_id=None):
+    while True:
+        clearScreen()
+        movies = execute_get_query(connection=connection, query="get_movies_of_list", inputs=[data[0]])
+        if movies:
+            print("Movies:")
+            printMovies(connection=connection, data=movies)
+        else:
+            print("No movies yet!")
+        show_menu(IN_LIST_NAV)
+        command = input("> ")
+        if command == "1":
+            index = input("Which one ?> ")
+            select_this_movie(connection=connection, data=movies[int(index)-1])
+        elif command == "2":
+            if movie_id:
+                add_movie_to_list(connection=connection, movie_id=movie_id, list_id=data[0])
+            else:
+                print("No movies selected.")
+        elif command == "3":
+            index = input("Which one ?> ")
+            remove_movie_from_list(connection=connection, list_id=data[0], movie_id=movies[int(index)-1][0])
+        elif command == "4":
+            remove_list(connection=connection, list_id=data[0])
+            break
+        elif command == "5":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
+def user_list_panel(connection, movie_id=None):
+    while True:
+        clearScreen()
+        data = execute_get_query(connection=connection, query="get_list", inputs=[USERNAME])
+        if data:
+            print("Current lists:")
+            printData(data=data)
+        else:
+            print("No lists yet!")
+        show_menu(USER_LIST_NAV)
+        command = input("> ")
+        if command == "1":
+            index = input("Which one ?> ")
+            view_list(connection=connection, data=data[int(index)-1], movie_id=movie_id)
+        elif command == "2":
+            new_list(connection=connection)
+        elif command == "3":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def user_panel(connection):
     """
     User panel routes the user to different parts of the user panel
@@ -573,23 +648,19 @@ def user_panel(connection):
         if command == '1':
             user_search_panel(connection=connection)
         elif command == '2':
-            # todo: Search others lists - View Add
-            pass
+            user_list_panel(connection=connection)
         elif command == '3':
-            # todo: Send to list panel - View Create Delete Modify
-            pass
-        elif command == '4':
             user_watch_panel(connection=connection)
-        elif command == '5':
+        elif command == '4':
             # todo: Send to chargin wallet
             pass 
-        elif command == '6':
+        elif command == '5':
             # todo: Send to change profile panel
             pass
-        elif command == '7':
+        elif command == '6':
             # todo: Send to special users panel
             pass
-        elif command == '8':
+        elif command == '7':
             break
         else:
             print(INPUT_ERROR)

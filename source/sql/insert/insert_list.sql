@@ -1,2 +1,2 @@
-INSERT INTO list (list_id, name, description)
-    VALUES(?, ?, ?);
+INSERT INTO list (list_id, username, name, description)
+    VALUES(?, ?, ?, ?);
