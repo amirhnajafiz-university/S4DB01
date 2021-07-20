@@ -36,6 +36,7 @@ dml_queries = {
     "remove_movie_from_list": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0, 'list_id': 0}},
     "remove_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0}},
     "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}},
+    "remove_special_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': None}},
     "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None}},
@@ -152,6 +153,23 @@ def view_users_panel(connection):
             print(INPUT_ERROR)
 
 
+def edit_movie(connection, data):
+    print("If you don't want to change a field, just press enter.")
+    file = input("Movie file > ")
+    if file == "":
+        file = data[1]
+    name = input("Movie name > ")
+    if name == "":
+        name = data[2]
+    year = input("Movie year > ")
+    if year == "":
+        year = data[3]
+    description = input("Movie description > ")
+    if description == "":
+        description = data[4]
+    execute_query(connection=connection, query="change_movie", inputs=[file, name, year, description, data[0]])
+
+
 def view_movie(connection, data):
     flag = execute_get_query(connection=connection, query="is_special_movie", inputs=[data[0]])
     creators = execute_get_query(connection=connection, query="get_movie_creators", inputs=[data[0]])
@@ -169,11 +187,18 @@ def view_movie(connection, data):
             show_menu(ADMIN_SELECT_MOVIE)
         command = input("> ")
         if command == "1":
-            pass # todo: edit
+            edit_movie(connection=connection, data=data)
+            break
         elif command == "2":
-            pass # todo: remove
+            execute_query(connection=connection, query="remove_movie", inputs=[data[0]])
+            break
         elif command == "3":
-            pass # todo: Add or remove special
+            if flag:
+                execute_query(connection=connection, query="remove_special_movie", inputs=[data[0]])
+            else:
+                price = int(input("Enter the price > "))
+                execute_query(connection=connection, query="insert_special_movie", inputs=[data[0], price])
+            break
         elif command == "4":
             break
         else:
