@@ -1,2 +1,2 @@
 SELECT *
-FROM "tags";
+FROM "tag";

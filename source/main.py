@@ -38,6 +38,7 @@ dml_queries = {
     "remove_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0}},
     "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}},
     "remove_special_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': None}},
+    "remove_tag": {'list': UPDATE_QUERIES, 'params': {'tag_id': 0}},
     "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None}},
@@ -193,7 +194,7 @@ def add_movie(connection):
     data = execute_get_query(connection=connection, query="get_tags", inputs=[])
     tags = None
     if data:
-        data = data[0]
+        print("Tags: ")
         printData(data=data)
         tags = input("Enter tags index like 1,2,... > ")
         tags = tags.split(",")
@@ -280,6 +281,30 @@ def view_movies_panel(connection):
             print(INPUT_ERROR)
 
 
+def view_tags(connection):
+    while True:
+        data = execute_get_query(connection=connection, query="get_tags", inputs=[])
+        if data:
+            data = data
+            print("Tags:")
+            printData(data)
+        else:
+            print("No tags.")
+        show_menu(ADMIN_TAG_NAV)
+        command = input("> ")
+        if command == "1":
+            name = input("Name > ")
+            execute_query(connection=connection, query="insert_tag", inputs=[int(str(uuid.uuid1().int)[-16:]), name])
+        elif command == "2":
+            if data:
+                index = int(input("Which one ?> "))
+                execute_query(connection=connection, query="remove_tag", inputs=[data[index-1][0]])
+        elif command == "3":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def admin_panel(connection):
     # todo: Admin can: add movie, remove movie, add a tag, remove a tag, change a tag, add special movie, remove special movie, edit movie, view users, view movies, view lists
     while True:
@@ -290,7 +315,7 @@ def admin_panel(connection):
         elif command == '2':
             view_movies_panel(connection=connection)
         elif command == '3':
-            pass # todo: tag modify
+            view_tags(connection=connection)
         elif command == '4':
             break
         else:
