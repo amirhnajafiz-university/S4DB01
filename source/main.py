@@ -44,7 +44,7 @@ dml_queries = {
     "remove_tag": {'list': UPDATE_QUERIES, 'params': {'tag_id': 0}},
     "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None, 'key': None}},
+    "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None, 'key': None, 'offset': 0}},
     "get_movie_creators": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_movies_of_list": {'list': REQUEST_QUERIES, 'params': {'list_id': 0}},
     "get_tags": {'list': REQUEST_QUERIES, 'params': {}},
@@ -60,8 +60,10 @@ dml_queries = {
     "user_watch": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_number_of_users": {'list': REQUEST_QUERIES, 'params': {}},
     "get_number_of_movies": {'list': REQUEST_QUERIES, 'params': {}},
+    "get_number_of_search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None}},
+    "get_number_of_search_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tname': None, 'pattern': None}},
     "get_movie_tags": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
-    "search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None}},
+    "search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None, 'offset': 0}},
     "is_special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
 }
 
@@ -417,16 +419,20 @@ def admin_panel(connection):
             print(INPUT_ERROR)
 
 
-def search_by_tag(connection, tags, choosed_tags, pattern):
+def search_by_tag(connection, tags, choosed_tags, pattern, offset):
     """
     This method search among the movies by tags we give.
     """
+    total = 0
     data = []
     for tag in choosed_tags:
-        temp = execute_get_query(connection=connection, query="get_movie_by_tag", inputs=[tags[int(tag)-1][1], f"%{pattern}%"])
+        garb = execute_get_query(connection=connection, query="get_number_of_search_movie_by_tag", inputs=[tags[int(tag)-1][1], f"%{pattern}%"])
+        if garb:
+            total += garb[0][0]
+        temp = execute_get_query(connection=connection, query="get_movie_by_tag", inputs=[tags[int(tag)-1][1], f"%{pattern}%", offset])
         if temp:
             data = data + temp
-    return list(dict.fromkeys(data))
+    return (list(dict.fromkeys(data)), total)
 
 
 def user_search_panel(connection):
@@ -449,20 +455,33 @@ def user_search_panel(connection):
     if tags and allow_tags == "Y":
         choosed_tags = input("Enter them like 1,2,... > ")
         choosed_tags = choosed_tags.split(",")
+    offset = 0
+    total = 0
     while True:
         clearScreen()
         data = []
         if tags and allow_tags == "Y":
-            data = search_by_tag(connection=connection, tags=tags, choosed_tags=choosed_tags, pattern=key)
+            result = search_by_tag(connection=connection, tags=tags, choosed_tags=choosed_tags, pattern=key, offset=offset)
+            data = result[0]
+            total = result[1]
         else:
-            data = execute_get_query(connection=connection, query="search_movie", inputs=[f"%{key}%"])
+            data = execute_get_query(connection=connection, query="search_movie", inputs=[f"%{key}%", offset])
+            total = execute_get_query(connection=connection, query="get_number_of_search_movie", inputs=[f"%{key}%"])
+            if total:
+                total = total[0][0]
+            else: 
+                total = 0
         printMovies(connection=connection, data=data)
+        status = calculate_page(offset=offset, total=total)
+        print(f"\nPage {status[0]} of {status[1]}\n")
         show_menu(USER_SEARCH_NAV)
         command = input("> ")
         if command == "1":
-            pass # Next
+            if offset + VIEW_LIMIT < total:
+                offset += VIEW_LIMIT
         elif command == "2":
-            pass # Prev
+            if offset - VIEW_LIMIT >= 0:
+                offset -= VIEW_LIMIT
         elif command == "3":
             pass # todo: Select
         elif command == "4":

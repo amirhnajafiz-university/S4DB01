@@ -1,3 +1,5 @@
 SELECT DISTINCT *
 FROM "movie"
-WHERE name LIKE ?;
+WHERE name LIKE ?
+LIMIT 5
+OFFSET ?;
