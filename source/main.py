@@ -136,10 +136,13 @@ def sign_up(connection):
     data['phone'] = input("> Enter Phone Number: ")
     data['ID'] = input("> Enter National ID: ")
     data['wallet'] = 0
-    data['points'] = 0
+    data['point'] = 0
     data['reference'] = input("> If you were invited by a user enter their username, if not just press enter: ")
-    if execute_query(connection=connection, query='insert_user', inputs=data.values()):
-        execute_query(connection=connection, query='modify_point', inputs=[1, data['reference']])
+    if data['reference'] == '':
+        data['reference'] = None
+    if execute_query(connection=connection, query='insert_user', inputs=list(data.values())):
+        if data['reference']:
+            execute_query(connection=connection, query='modify_point', inputs=[1, data['reference']])
         print("User added.")
     else:
         print("User not added")
