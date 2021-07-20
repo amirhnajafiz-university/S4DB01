@@ -7,6 +7,10 @@ from console import *
 
 DEF_DIR = './database/'
 DATABASE = DEF_DIR + 'stream.db'
+USERNAME = None
+
+INPUT_ERROR = "Wrong input!"
+VIEW_LIMIT = 5
 
 dml_queries = {
     "insert_admin": {'list': INSERT_QUERIES, 'params': {'username': None, 'password': None}},
@@ -40,14 +44,15 @@ dml_queries = {
     "get_tags": {'list': REQUEST_QUERIES, 'params': {'name': None}},
     "admin_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
     "search_movie": {'list': REQUEST_QUERIES, 'params': {'key': None, 'value': None}},
-    "search_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
+    "get_users": {'list': REQUEST_QUERIES, 'params': {'offset': 0}},
     "special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "special_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "user_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
     "user_point": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "user_wallet": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "user_watch_special": {'list': REQUEST_QUERIES, 'params': {'pro_id': None}},
-    "user_watch": {'list': REQUEST_QUERIES, 'params': {'username': None}}
+    "user_watch": {'list': REQUEST_QUERIES, 'params': {'username': None}},
+    "get_number_of_users": {'list': REQUEST_QUERIES, 'params': {}}
 }
 
 
@@ -115,8 +120,49 @@ def import_temp_data(connection):
         execute_query(connection=connection, query=obj['op'], inputs=list(obj['data'].values()))
 
 
+def printData(data):
+    index = 1
+    for item in data:
+        print(f"{index}. {item}")
+        index += 1
+
+
+def view_users_panel(connection):
+    offset = 0
+    total = execute_get_query(connection=connection, query="get_number_of_users", inputs=[])[0][0]
+    while True:
+        print(f"Total found: {total}")
+        data = execute_get_query(connection=connection, query="get_users", inputs=[offset])
+        printData(data=data)
+        show_menu(ADMIN_MOVIE)
+        command = input("> ")
+        if command == "1":
+            if offset + VIEW_LIMIT < total:
+                offset += VIEW_LIMIT
+        elif command == "2":
+            if offset - VIEW_LIMIT >= 0:
+                offset -= VIEW_LIMIT
+        elif command == "3":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def admin_panel(connection):
-    pass # todo: Admin can: add movie, remove movie, add a tag, remove a tag, change a tag, add special movie, remove special movie, edit movie, view users, view movies, view lists
+    # todo: Admin can: add movie, remove movie, add a tag, remove a tag, change a tag, add special movie, remove special movie, edit movie, view users, view movies, view lists
+    while True:
+        show_menu(ADMIN)
+        command = input("> ")
+        if command == '1':
+            view_users_panel(connection=connection)
+        elif command == '2':
+            pass # movies panel
+        elif command == '3':
+            pass # view lists panel
+        elif command == '4':
+            break
+        else:
+            print(INPUT_ERROR)
 
 
 def user_panel(connection):
@@ -128,15 +174,17 @@ def login(connection):
     Login panel where the user enters username and password and we check the information.
     """
     data = {}
-    data['username'] = input("> Enter Username: ")
-    data['password'] = input("> Enter Password: ")
+    data['username'] = "amirhossein" # input("> Enter Username: ")
+    data['password'] = "1270" # input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
-        print("Admin")
+        USERNAME = result[0][0]
+        admin_panel(connection=connection)
     result = execute_get_query(connection=connection, query='user_login', inputs=data.values())
     if result:
-        print("User")
-    print("Not found.")
+        USERNAME = result[0][0]
+        user_panel(connection=connection)
+    print("Login faild.")
 
 
 def sign_up(connection):
@@ -158,9 +206,9 @@ def sign_up(connection):
     if execute_query(connection=connection, query='insert_user', inputs=list(data.values())):
         if data['reference']:
             execute_query(connection=connection, query='modify_point', inputs=[1, data['reference']])
-        print("User added.")
+        print("Registerd Successfuly.")
     else:
-        print("User not added")
+        print("Failed Registration.")
         return
 
 
@@ -176,7 +224,7 @@ def root():
         elif command == '3':
             break
         else:
-            print("Wrong input!")
+            print(INPUT_ERROR)
     connection.close()
 
 
