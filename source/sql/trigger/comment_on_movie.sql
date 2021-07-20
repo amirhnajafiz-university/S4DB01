@@ -1,10 +1,7 @@
 CREATE TRIGGER comment_on_movie AFTER INSERT ON "comment"
 BEGIN 
     SELECT CASE
-        WHEN(NEW.pro_username NOT IN (SELECT username FROM "watch" WHERE movie_id = NEW.movie_id) OR 
-                                      NEW.pro_username NOT IN (SELECT username 
-                                      FROM "special_user" as S JOIN "user" U ON S.username = U.username 
-                                      WHERE S.pro_id = SOME (SELECT pro_id FROM "watch_special" as W WHERE W.movie_id = NEW.movie_id ) ))
+        WHEN(NEW.pro_username NOT IN (SELECT W.username FROM "watch" as W WHERE NEW.movid_id = W.movie_id)) OR (NEW.pro_username NOT IN (SELECT U.username FROM "watch_special" as W JOIN "special_user" as U ON W.pro_id = U.pro_id WHERE NEW.movid_id = W.movie_id))
         THEN RAISE(ABORT, 'Cannot comment on this movie. Not watched yet!')
         END;
     END;

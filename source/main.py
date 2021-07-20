@@ -40,6 +40,9 @@ dml_queries = {
     "delete_tables": {'list': DELETE_QUERIES, 'params': {}},
     "change_movie": {'list': UPDATE_QUERIES, 'params': {'file': None, 'name': None, 'movie_year': None, 'description': None, 'movie_id': None}},
     "change_password": {'list': UPDATE_QUERIES, 'params': {'password': None, 'username': None}},
+    "change_name": {'list': UPDATE_QUERIES, 'params': {'name': None, 'username': None}},
+    "change_mail": {'list': UPDATE_QUERIES, 'params': {'mail': None, 'username': None}},
+    "change_phone": {'list': UPDATE_QUERIES, 'params': {'phone': None, 'username': None}},
     "modify_point": {'list': UPDATE_QUERIES, 'params': {'point': 0, 'username': None}},
     "modify_wallet": {'list': UPDATE_QUERIES, 'params': {'wallet': 0, 'username': None}},
     "remove_user_pro": {'list': UPDATE_QUERIES, 'params': {'pro_id': None}},
@@ -163,7 +166,7 @@ def clearScreen():
     """
     Simple method for formatting the console.
     """
-    os.system('cls' if os.name=='nt' else 'clear')
+    # os.system('cls' if os.name=='nt' else 'clear')
     print(f"User {USERNAME} ", end="")
     if ISADMIN:
         print("As Admin\n")
@@ -464,13 +467,17 @@ def watch_movie(connection, movie_id, is_special):
     """
     This method inserts a new watch for user.
     """
-    query = "insert_watch"
-    id = USERNAME
     if is_special:
-        query = "insert_watch_special"
-        id = PRO_ID
-    if not execute_query(connection=connection, query=query, inputs=[id, movie_id]):
-        print("Can't watch.")
+        if PRO_ID == None:
+            if execute_query(connection=connection, query="modify_point", inputs=[-1, USERNAME], allow_commit=False):
+                if execute_query(connection=connection, query="insert_watch", inputs=[USERNAME, movie_id], disable_transation=True):
+                    connection.commit()
+                else:
+                    connection.rollback()
+        else:
+            execute_query(connection=connection, query="insert_watch_special", inputs=[PRO_ID, movie_id])
+    else:
+        execute_query(connection=connection, query="insert_watch", inputs=[USERNAME, movie_id])
 
 
 def comment_this_movie(connection, movie_id):
@@ -523,7 +530,12 @@ def select_this_movie(connection, data):
             if offset - VIEW_LIMIT >= 0:
                 offset -= VIEW_LIMIT
         elif command == "3":
-            watch_movie(connection=connection, movie_id=data[0], is_special=flag)
+            if flag and PRO_ID == None:
+                temp = input("Since this is special movie you will loose 1 point to see this, do you want ?(Y/n)> ")
+                if temp == "Y":
+                    watch_movie(connection=connection, movie_id=data[0], is_special=flag)
+            else:
+                watch_movie(connection=connection, movie_id=data[0], is_special=flag)
         elif command == "4":
             comment_this_movie(connection=connection, movie_id=data[0])
         elif command == "5":
@@ -595,9 +607,15 @@ def user_watch_panel(connection):
     This method shows the user the history of the user movies.
     """
     data = execute_get_query(connection=connection, query="user_watch", inputs=[USERNAME])
+    special_data = None
+    if PRO_ID:
+        special_data = execute_query(connection=connection, query="user_watch_special", inputs=[PRO_ID])
     if data:
         print("Your history:")
         printData(data=data)
+    if special_data:
+        print("Special movies:")
+        printData(data=special_data)
     input("Press enter to exit > ")
 
 
@@ -729,6 +747,29 @@ def password_change(connection):
             break
 
 
+def profile_change(connection):
+    """
+    This method changes the profile of the user.
+    """
+    while True:
+        clearScreen()
+        show_menu(USER_PROFILE_CHANGE)
+        command = input("> ")
+        if command == "1":
+            name = input("New name > ")
+            execute_query(connection=connection, query="change_name", inputs=[name, USERNAME])
+        elif command == "2":
+            email = input("New mail > ")
+            execute_query(connection=connection, query="change_email", inputs=[email, USERNAME])
+        elif command == "3":
+            phone = input("New phone number > ")
+            execute_query(connection=connection, query="change_phone", inputs=[phone, USERNAME])
+        elif command == "4":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def add_pro_user(connection):
     """
     This method adds a new user to the pro users list.
@@ -801,15 +842,11 @@ def user_panel(connection):
         elif command == '6':
             pro_panel(connection=connection)
         elif command == '7':
+            profile_change(connection=connection)
+        elif command == '8':
             break
         else:
             print(INPUT_ERROR)
-
-
-# todo: Create a trigger for pro check
-# todo: Fix the watch and special watch
-# todo: Handle the point watching
-# todo: Add user other profile change
 
 
 def login(connection):
@@ -819,7 +856,7 @@ def login(connection):
     global USERNAME, ISADMIN, PRO_ID
     data = {}
     data['username'] = "user5" # input("> Enter Username: ")
-    data['password'] = "45" # input("> Enter Password: ")
+    data['password'] = "p55555555" # input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
@@ -882,3 +919,6 @@ def root():
 
 if __name__ == '__main__':
     root()
+
+# todo: Fix triggers
+# todo: Tables output format define

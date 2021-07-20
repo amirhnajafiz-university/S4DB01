@@ -16,17 +16,9 @@ TRUNCATE TABLE "comment";
 
 TRUNCATE TABLE "movie_in_list";
 
-TRUNCATE TABLE "list_for_user";
-
 TRUNCATE TABLE "movie_creator";
 
-TRUNCATE TABLE "movie_special";
-
 TRUNCATE TABLE "movie_tag";
-
-TRUNCATE TABLE "reference";
-
-TRUNCATE TABLE "user_pro";
 
 TRUNCATE TABLE "watch_special";
 

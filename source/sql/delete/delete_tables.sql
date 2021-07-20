@@ -16,17 +16,9 @@ DROP TABLE "comment";
 
 DROP TABLE "movie_in_list";
 
-DROP TABLE "list_for_user";
-
 DROP TABLE "movie_creator";
 
-DROP TABLE "movie_special";
-
 DROP TABLE "movie_tag";
-
-DROP TABLE "reference";
-
-DROP TABLE "user_pro";
 
 DROP TABLE "watch_special";
 
