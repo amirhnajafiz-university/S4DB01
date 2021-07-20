@@ -12,10 +12,12 @@ from createDB import MAIN_DIR
 DELETE_DIR = MAIN_DIR + '/delete/'
 INSERT_DIR = MAIN_DIR + '/insert/'
 UPDATE_DIR = MAIN_DIR + '/update/'
+REQUEST_DIR = MAIN_DIR + '/request/'
 
 DELETE_QUERIES = {}
 INSERT_QUERIES = {}
 UPDATE_QUERIES = {}
+REQUEST_QUERIES = {}
 
 
 def init(address, dic):
@@ -28,3 +30,4 @@ def init(address, dic):
 init(DELETE_DIR, DELETE_QUERIES)
 init(INSERT_DIR, INSERT_QUERIES)
 init(UPDATE_DIR, UPDATE_QUERIES)
+init(REQUEST_DIR, REQUEST_QUERIES)

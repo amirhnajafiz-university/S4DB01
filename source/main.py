@@ -1,7 +1,8 @@
 from sqlite3 import Error
 from createDB import create_connection, create_database, initialize_tables
-from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES
+from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUERIES
 from import_data import load_data
+from console import *
 
 
 DEF_DIR = './database/'
@@ -30,10 +31,24 @@ dml_queries = {
     "remove_user_pro": {'list': UPDATE_QUERIES, 'params': {'pro_id': None}},
     "remove_movie_from_list": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0, 'list_id': 0}},
     "remove_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0}},
-    "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}}
+    "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}},
+    "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
+    "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
+    "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None}},
+    "get_movie_creators": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
+    "get_movies_of_list": {'list': REQUEST_QUERIES, 'params': {'list_id': 0}},
+    "get_tags": {'list': REQUEST_QUERIES, 'params': {'name': None}},
+    "search_admin": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
+    "search_movie": {'list': REQUEST_QUERIES, 'params': {'key': None, 'value': None}},
+    "search_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
+    "special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
+    "special_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
+    "user_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
+    "user_point": {'list': REQUEST_QUERIES, 'params': {'username': None}},
+    "user_wallet": {'list': REQUEST_QUERIES, 'params': {'username': None}},
+    "user_watch_special": {'list': REQUEST_QUERIES, 'params': {'pro_id': None}},
+    "user_watch": {'list': REQUEST_QUERIES, 'params': {'username': None}}
 }
-
-# TODO: Create the get queries, for movie search, user login, user search, ...
 
 
 def init():
