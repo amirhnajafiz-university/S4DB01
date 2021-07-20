@@ -1,0 +1,3 @@
+SELECT DISTINCT *
+FROM "movie"
+WHERE name LIKE ?;

@@ -44,7 +44,7 @@ dml_queries = {
     "remove_tag": {'list': UPDATE_QUERIES, 'params': {'tag_id': 0}},
     "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None}},
+    "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None, 'key': None}},
     "get_movie_creators": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "get_movies_of_list": {'list': REQUEST_QUERIES, 'params': {'list_id': 0}},
     "get_tags": {'list': REQUEST_QUERIES, 'params': {}},
@@ -61,6 +61,7 @@ dml_queries = {
     "get_number_of_users": {'list': REQUEST_QUERIES, 'params': {}},
     "get_number_of_movies": {'list': REQUEST_QUERIES, 'params': {}},
     "get_movie_tags": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
+    "search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None}},
     "is_special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
 }
 
@@ -416,18 +417,95 @@ def admin_panel(connection):
             print(INPUT_ERROR)
 
 
+def search_by_tag(connection, tags, choosed_tags, pattern):
+    """
+    This method search among the movies by tags we give.
+    """
+    data = []
+    for tag in choosed_tags:
+        temp = execute_get_query(connection=connection, query="get_movie_by_tag", inputs=[tags[int(tag)-1][1], f"%{pattern}%"])
+        if temp:
+            data = data + temp
+    return list(dict.fromkeys(data))
+
+
+def user_search_panel(connection):
+    """
+    User search panel lets the user to search in movies
+    """
+    clearScreen()
+    key = input("Enter a name, or a part of name for search > ")
+    if key == "":
+        key = "_"
+    tags = execute_get_query(connection=connection, query="get_tags", inputs=[])
+    allow_tags = input("Do you want to search based on special tags ?(Y/n)> ")
+    choosed_tags = []
+    if allow_tags == "Y":
+        if tags:
+            print("Tags:")
+            printData(tags)
+        else:
+            print("No tags avilable.")
+    if tags and allow_tags == "Y":
+        choosed_tags = input("Enter them like 1,2,... > ")
+        choosed_tags = choosed_tags.split(",")
+    while True:
+        clearScreen()
+        data = []
+        if tags and allow_tags == "Y":
+            data = search_by_tag(connection=connection, tags=tags, choosed_tags=choosed_tags, pattern=key)
+        else:
+            data = execute_get_query(connection=connection, query="search_movie", inputs=[f"%{key}%"])
+        printMovies(connection=connection, data=data)
+        show_menu(USER_SEARCH_NAV)
+        command = input("> ")
+        if command == "1":
+            pass # Next
+        elif command == "2":
+            pass # Prev
+        elif command == "3":
+            pass # todo: Select
+        elif command == "4":
+            break
+        else:
+            print(INPUT_ERROR)
+
+
 def user_panel(connection):
-    # todo: User can: watch movie, increase wallet, comment, make list, add to list, remove from list, view movies, view lists, and go pro
-    # todo: Create a search panel to search movie, by name, tag, list name
-    # todo: Create a wallet panel, where user can charge its wallet
-    # todo: Create a watch panel, where user can see its watched movies
-    # todo: Create a movie panel like admin, so user can view an comment ( implement it in search panel )
-    # todo: Create a panel where user can see its status about being pro
-    # todo: Create a list panel, where user and create and modify list
-    pass
+    """
+    User panel routes the user to different parts of the user panel
+    """
+    while True:
+        clearScreen()
+        show_menu(USER_NAV)
+        command = input("> ")
+        if command == '1':
+            user_search_panel(connection=connection)
+        elif command == '2':
+            # todo: Search others lists - View Add
+            pass
+        elif command == '3':
+            # todo: Send to list panel - View Create Delete Modify
+            pass
+        elif command == '4':
+            # todo: View the list of watched movies
+            pass
+        elif command == '5':
+            # todo: Send to chargin wallet
+            pass 
+        elif command == '6':
+            # todo: Send to change profile panel
+            pass
+        elif command == '7':
+            # todo: Send to special users panel
+            pass
+        elif command == '8':
+            break
+        else:
+            print(INPUT_ERROR)
+
 
 # todo: Create a trigger for pro check
-
 
 
 def login(connection):
@@ -436,8 +514,8 @@ def login(connection):
     """
     global USERNAME, ISADMIN
     data = {}
-    data['username'] = "amirhossein" # input("> Enter Username: ")
-    data['password'] = "1270" # input("> Enter Password: ")
+    data['username'] = "user5" # input("> Enter Username: ")
+    data['password'] = "p55555555" # input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
