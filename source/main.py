@@ -921,5 +921,4 @@ def root():
 if __name__ == '__main__':
     root()
 
-# todo: Fix triggers
 # todo: Tables output format define
