@@ -14,10 +14,7 @@ INSERT_DIR = MAIN_DIR + '/insert/'
 UPDATE_DIR = MAIN_DIR + '/update/'
 REQUEST_DIR = MAIN_DIR + '/request/'
 
-DELETE_QUERIES = {}
-INSERT_QUERIES = {}
-UPDATE_QUERIES = {}
-REQUEST_QUERIES = {}
+QUERIES = {}
 
 
 def init(address, dic):
@@ -27,7 +24,7 @@ def init(address, dic):
             dic[file[:-4]] = myFile.read()
 
 
-init(DELETE_DIR, DELETE_QUERIES)
-init(INSERT_DIR, INSERT_QUERIES)
-init(UPDATE_DIR, UPDATE_QUERIES)
-init(REQUEST_DIR, REQUEST_QUERIES)
+init(DELETE_DIR, QUERIES)
+init(INSERT_DIR, QUERIES)
+init(UPDATE_DIR, QUERIES)
+init(REQUEST_DIR, QUERIES)

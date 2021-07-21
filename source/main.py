@@ -1,6 +1,6 @@
 from sqlite3 import Error
 from createDB import create_connection, create_database, initialize_tables
-from queries import INSERT_QUERIES, DELETE_QUERIES, UPDATE_QUERIES, REQUEST_QUERIES
+from queries import QUERIES
 from import_data import load_data
 from console import *
 import uuid
@@ -24,66 +24,6 @@ INPUT_ERROR = "Wrong input!"
 VIEW_LIMIT = 5
 SPLITTER = "==============================="
 
-dml_queries = {
-    "insert_admin": {'list': INSERT_QUERIES, 'params': {'username': None, 'password': None}},
-    "insert_comment": {'list': INSERT_QUERIES, 'params': {'rate': 0, 'user_comment': None, 'username': None, 'movie_id': None}},
-    "insert_creator": {'list': INSERT_QUERIES, 'params': {'creator': None, 'movie_id': None}},
-    "insert_list": {'list': INSERT_QUERIES, 'params': {'list_id': 0, 'username': None, 'name': None, 'description': None}},
-    "insert_movie_in_list": {'list': INSERT_QUERIES, 'params': {'special_id': 0, 'movie_id': 0, 'list_id': 0}},
-    "insert_movie_tag": {'list': INSERT_QUERIES, 'params': {'tag_id': None, 'movie_id': None}},
-    "insert_movie": {'list': INSERT_QUERIES, 'params': {'movie_id': None, 'movie_file': None, 'name': None, 'movie_year': None, 'description': None}},
-    "insert_special_movie": {'list': INSERT_QUERIES, 'params': {'special_id': None, 'movie_id': None, 'price': None}},
-    "insert_special_user": {'list': INSERT_QUERIES, 'params': {'pro_id': 0, 'username': None, 'expiredate': None}},
-    "insert_tag": {'list': INSERT_QUERIES, 'params': {'tag_id': None, 'name': None}},
-    "insert_user": {'list': INSERT_QUERIES, 'params': {'username': None, 'password': None, 'name': None, 'email': None, 'phonenumber': None, 'nationalID': None, 'wallet': 0, 'point': 0, 'reference': None}},
-    "insert_watch_special": {'list': INSERT_QUERIES, 'params': {'pro_id': None, 'movie_id': None}},
-    "insert_watch": {'list': INSERT_QUERIES, 'params': {'username': None, 'movie_id': None}},
-    "clear_tables": {'list': DELETE_QUERIES, 'params': {}},
-    "delete_tables": {'list': DELETE_QUERIES, 'params': {}},
-    "change_movie": {'list': UPDATE_QUERIES, 'params': {'file': None, 'name': None, 'movie_year': None, 'description': None, 'movie_id': None}},
-    "change_password": {'list': UPDATE_QUERIES, 'params': {'password': None, 'username': None}},
-    "change_name": {'list': UPDATE_QUERIES, 'params': {'name': None, 'username': None}},
-    "change_email": {'list': UPDATE_QUERIES, 'params': {'mail': None, 'username': None}},
-    "change_phone": {'list': UPDATE_QUERIES, 'params': {'phone': None, 'username': None}},
-    "modify_point": {'list': UPDATE_QUERIES, 'params': {'point': 0, 'username': None}},
-    "modify_wallet": {'list': UPDATE_QUERIES, 'params': {'wallet': 0, 'username': None}},
-    "remove_user_pro": {'list': UPDATE_QUERIES, 'params': {'pro_id': None}},
-    "remove_movie_from_list": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0, 'list_id': 0}},
-    "remove_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': 0}},
-    "remove_user": {'list': UPDATE_QUERIES, 'params': {'username': None}},
-    "remove_special_movie": {'list': UPDATE_QUERIES, 'params': {'movie_id': None}},
-    "remove_tag": {'list': UPDATE_QUERIES, 'params': {'tag_id': 0}},
-    "remove_list": {'list': UPDATE_QUERIES, 'params': {'list_id': 0}},
-    "update_credit": {'list': UPDATE_QUERIES, 'params': {'expiredate': None, 'pro_id': None}},
-    "get_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0, 'offset': 0}},
-    "get_list": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "get_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tag': None, 'key': None, 'offset': 0}},
-    "get_movie_creators": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
-    "get_movies_of_list": {'list': REQUEST_QUERIES, 'params': {'list_id': 0}},
-    "get_tags": {'list': REQUEST_QUERIES, 'params': {}},
-    "admin_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
-    "get_movies": {'list': REQUEST_QUERIES, 'params': {'offset': 0}},
-    "get_users": {'list': REQUEST_QUERIES, 'params': {'offset': 0}},
-    "special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
-    "special_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "user_login": {'list': REQUEST_QUERIES, 'params': {'username': None, 'password': None}},
-    "user_point": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "user_wallet": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "user_watch_special": {'list': REQUEST_QUERIES, 'params': {'pro_id': None}},
-    "user_watch": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "get_number_of_users": {'list': REQUEST_QUERIES, 'params': {}},
-    "get_number_of_comments": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
-    "get_number_of_movies": {'list': REQUEST_QUERIES, 'params': {}},
-    "get_number_of_search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None}},
-    "get_number_of_search_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tname': None, 'pattern': None}},
-    "get_movie_tags": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
-    "get_current_credit": {'list': REQUEST_QUERIES, 'params': {'pro_id': 0}},
-    "get_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
-    "get_average_rate": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
-    "search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None, 'offset': 0}},
-    "is_special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
-}
-
 
 def init():
     """
@@ -102,7 +42,7 @@ def execute_delete(connection, query):
     """
     try:
         c = connection.cursor()
-        c.executescript(DELETE_QUERIES[query])
+        c.executescript(QUERIES[query])
     except Error as e:
         print(e)
         connection.rollback()
@@ -124,7 +64,7 @@ def execute_query(connection, query, inputs, allow_commit=True, disable_transati
         c = connection.cursor()
         if not disable_transation:
             c.execute("BEGIN TRANSACTION;")
-        c.execute(dml_queries[query]['list'][query], inputs)
+        c.execute(QUERIES[query], inputs)
         if allow_commit:
             c.execute("COMMIT;")
             print("> Commited")
@@ -146,7 +86,7 @@ def execute_get_query(connection, query, inputs):
     data = None
     try:
         c = connection.cursor()
-        c.execute(dml_queries[query]['list'][query], list(inputs))
+        c.execute(QUERIES[query], list(inputs))
         data = c.fetchall()
         ERROR = False
     except Error as e:
@@ -945,8 +885,5 @@ def root():
     connection.close()
 
 
-
 if __name__ == '__main__':
     root()
-
-# todo: Tables output format define
