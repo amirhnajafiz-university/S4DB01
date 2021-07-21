@@ -150,9 +150,9 @@ def calculate_page(offset, total):
     This method simply gets the status of paging for us.
     """
     pages = math.ceil(total / VIEW_LIMIT)
-    current = math.ceil(offset / VIEW_LIMIT)
-    if current == 0 and pages != 0:
-        current = 1
+    current = int(offset / VIEW_LIMIT) + 1
+    if pages == 0:
+        current = 0
     return (current, pages)
 
 
@@ -823,8 +823,8 @@ def login(connection):
     """
     global USERNAME, ISADMIN, PRO_ID, USER_DATA
     data = {}
-    data['username'] = "user6" # input("> Enter Username: ")
-    data['password'] = "p66666666" # input("> Enter Password: ")
+    data['username'] = input("> Enter Username: ")
+    data['password'] = input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
