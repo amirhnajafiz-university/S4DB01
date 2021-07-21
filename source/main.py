@@ -439,7 +439,11 @@ def watch_movie(connection, movie_id, is_special):
                 else:
                     connection.rollback()
         else:
-            execute_query(connection=connection, query="insert_watch_special", inputs=[PRO_ID, movie_id])
+            if execute_query(connection=connection, query="modify_wallet", inputs=[-1 * is_special[0][2], USERNAME], allow_commit=False):
+                if execute_query(connection=connection, query="insert_watch_special", inputs=[PRO_ID, movie_id], disable_transation=True):
+                    connection.commit()
+                else:
+                    connection.rollback()
     else:
         execute_query(connection=connection, query="insert_watch", inputs=[USERNAME, movie_id])
 
