@@ -15,6 +15,7 @@ DATABASE = DEF_DIR + 'stream.db'
 USERNAME = None
 ISADMIN = False
 PRO_ID = None
+USER_DATA = None
 
 ERROR_MESSAGE = None
 ERROR = False
@@ -42,7 +43,7 @@ dml_queries = {
     "change_movie": {'list': UPDATE_QUERIES, 'params': {'file': None, 'name': None, 'movie_year': None, 'description': None, 'movie_id': None}},
     "change_password": {'list': UPDATE_QUERIES, 'params': {'password': None, 'username': None}},
     "change_name": {'list': UPDATE_QUERIES, 'params': {'name': None, 'username': None}},
-    "change_mail": {'list': UPDATE_QUERIES, 'params': {'mail': None, 'username': None}},
+    "change_email": {'list': UPDATE_QUERIES, 'params': {'mail': None, 'username': None}},
     "change_phone": {'list': UPDATE_QUERIES, 'params': {'phone': None, 'username': None}},
     "modify_point": {'list': UPDATE_QUERIES, 'params': {'point': 0, 'username': None}},
     "modify_wallet": {'list': UPDATE_QUERIES, 'params': {'wallet': 0, 'username': None}},
@@ -77,6 +78,7 @@ dml_queries = {
     "get_number_of_search_movie_by_tag": {'list': REQUEST_QUERIES, 'params': {'tname': None, 'pattern': None}},
     "get_movie_tags": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
     "get_current_credit": {'list': REQUEST_QUERIES, 'params': {'pro_id': 0}},
+    "get_user": {'list': REQUEST_QUERIES, 'params': {'username': None}},
     "get_average_rate": {'list': REQUEST_QUERIES, 'params': {'movie_id': 0}},
     "search_movie": {'list': REQUEST_QUERIES, 'params': {'pattern': None, 'offset': 0}},
     "is_special_movie": {'list': REQUEST_QUERIES, 'params': {'movie_id': None}},
@@ -140,6 +142,7 @@ def execute_get_query(connection, query, inputs):
     """
     This method executes type of queries that return a data from database.
     """
+    global ERROR, ERROR_MESSAGE
     data = None
     try:
         c = connection.cursor()
@@ -168,23 +171,35 @@ def clearScreen():
     Simple method for formatting the console.
     """
     # os.system('cls' if os.name=='nt' else 'clear')
-    print(f"User {USERNAME} ", end="")
     if ISADMIN:
+        print(f"User {USERNAME} ", end="")
         print("As Admin\n")
     else:
-        print("\n")
+        print(f"User: {USER_DATA[2]} | Mail: {USER_DATA[3]} | Phone: {USER_DATA[4]}", end="")
+        if PRO_ID:
+            print(" | You are a pro user.")
+        else:
+            print()
     print(SPLITTER)
 
 
-def printData(data):
+def printData(data, primary_key_hide=True):
     """
     This method gets a list and prints it.
     """
-    index = 1
     if len(data) > 0:
         print(SPLITTER)
+    index = 1
     for item in data:
-        print(f"{index}. {item}\n")
+        print(f"{index}.", end=" ")
+        for i in range(len(item)):
+            if i == 0 and primary_key_hide:
+                continue
+            print(f"{item[i]}", end="")
+            if i == len(item) - 1:
+                print()
+            else:
+                print(" | ", end="")
         index += 1
     if len(data) > 0:
         print(SPLITTER)
@@ -196,6 +211,8 @@ def calculate_page(offset, total):
     """
     pages = math.ceil(total / VIEW_LIMIT)
     current = math.ceil(offset / VIEW_LIMIT)
+    if current == 0 and pages != 0:
+        current = 1
     return (current, pages)
 
 
@@ -207,7 +224,13 @@ def printMovies(connection, data):
     if len(data) > 0:
         print(SPLITTER)
     for item in data:
-        print(f'{index}. {item}', end="")
+        print(f"{index}.", end=" ")
+        for i in range(len(item)):
+            if i == 0:
+                continue
+            print(f"{item[i]}", end="")
+            if i != len(item) - 1:
+                print(" | ", end="")          
         if execute_get_query(connection=connection, query="is_special_movie", inputs=[item[0]]):
             print(" => Special\n")
         else:
@@ -227,7 +250,7 @@ def view_users_panel(connection):
         total = execute_get_query(connection=connection, query="get_number_of_users", inputs=[])[0][0]  # Total number of records
         print(f"Total found: {total}")
         data = execute_get_query(connection=connection, query="get_users", inputs=[offset])
-        printData(data=data)
+        printData(data=data, primary_key_hide=False)
         status = calculate_page(offset=offset, total=total)
         print(f"\nPage {status[0]} of {status[1]}\n")
         show_menu(ADMIN_USER_NAV)
@@ -507,7 +530,7 @@ def select_this_movie(connection, data):
             total = 0
         comments = execute_get_query(connection=connection, query="get_comments", inputs=[data[0], offset])
         clearScreen()
-        print(data)
+        printMovies([data])
         if creators:
             print("Movie creator:")
             printData(creators)
@@ -516,7 +539,7 @@ def select_this_movie(connection, data):
             printData(tags)
         if flag:
             print(f'Price: {flag[0][2]}$')
-        print(f"Average rate by users {average[0][0]}.")
+        print(f"\nAverage rate by users {average[0][0]}.\n")
         if comments:
             print("Movie Comments:")
             printData(comments)
@@ -752,7 +775,11 @@ def profile_change(connection):
     """
     This method changes the profile of the user.
     """
+    global USER_DATA
     while True:
+        USER_DATA = execute_get_query(connection=connection, query="get_user", inputs=[USERNAME])
+        if USER_DATA:
+            USER_DATA = USER_DATA[0]
         clearScreen()
         show_menu(USER_PROFILE_CHANGE)
         command = input("> ")
@@ -839,9 +866,9 @@ def user_panel(connection):
         elif command == '4':
             user_pay_panel(connection=connection)
         elif command == '5':
-            password_change(connection=connection)
-        elif command == '6':
             pro_panel(connection=connection)
+        elif command == '6':
+            password_change(connection=connection)
         elif command == '7':
             profile_change(connection=connection)
         elif command == '8':
@@ -854,7 +881,7 @@ def login(connection):
     """
     Login panel where the user enters username and password and we check the information.
     """
-    global USERNAME, ISADMIN, PRO_ID
+    global USERNAME, ISADMIN, PRO_ID, USER_DATA
     data = {}
     data['username'] = "user5" # input("> Enter Username: ")
     data['password'] = "11111111" # input("> Enter Password: ")
@@ -869,6 +896,7 @@ def login(connection):
         flag = execute_get_query(connection=connection, query="special_user", inputs=[USERNAME])
         if flag:
             PRO_ID = flag[0][0]
+        USER_DATA = result[0]
         user_panel(connection=connection)
 
 
