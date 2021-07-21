@@ -175,7 +175,7 @@ def clearScreen():
         print(f"User {USERNAME} ", end="")
         print("As Admin\n")
     else:
-        print(f"User: {USER_DATA[2]} | Mail: {USER_DATA[3]} | Phone: {USER_DATA[4]}", end="")
+        print(f"User: {USER_DATA[2]} | Mail: {USER_DATA[3]} | Phone: {USER_DATA[4]} | Points: {USER_DATA[7]}", end="")
         if PRO_ID:
             print(" | You are a pro user.")
         else:
@@ -530,7 +530,7 @@ def select_this_movie(connection, data):
             total = 0
         comments = execute_get_query(connection=connection, query="get_comments", inputs=[data[0], offset])
         clearScreen()
-        printMovies([data])
+        printMovies(connection=connection, data=[data])
         if creators:
             print("Movie creator:")
             printData(creators)
@@ -883,8 +883,8 @@ def login(connection):
     """
     global USERNAME, ISADMIN, PRO_ID, USER_DATA
     data = {}
-    data['username'] = "user5" # input("> Enter Username: ")
-    data['password'] = "11111111" # input("> Enter Password: ")
+    data['username'] = "user6" # input("> Enter Username: ")
+    data['password'] = "p66666666" # input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
