@@ -7,6 +7,7 @@ import uuid
 import os
 import datetime
 from dateutil import parser
+import math
 
 
 DEF_DIR = './database/'
@@ -193,8 +194,8 @@ def calculate_page(offset, total):
     """
     This method simply gets the status of paging for us.
     """
-    pages = int(total / VIEW_LIMIT) + 1
-    current = int(offset / VIEW_LIMIT) + 1
+    pages = math.ceil(total / VIEW_LIMIT)
+    current = math.ceil(offset / VIEW_LIMIT)
     return (current, pages)
 
 
@@ -609,7 +610,7 @@ def user_watch_panel(connection):
     data = execute_get_query(connection=connection, query="user_watch", inputs=[USERNAME])
     special_data = None
     if PRO_ID:
-        special_data = execute_query(connection=connection, query="user_watch_special", inputs=[PRO_ID])
+        special_data = execute_get_query(connection=connection, query="user_watch_special", inputs=[PRO_ID])
     if data:
         print("Your history:")
         printData(data=data)
@@ -856,7 +857,7 @@ def login(connection):
     global USERNAME, ISADMIN, PRO_ID
     data = {}
     data['username'] = "user5" # input("> Enter Username: ")
-    data['password'] = "p55555555" # input("> Enter Password: ")
+    data['password'] = "11111111" # input("> Enter Password: ")
     result = execute_get_query(connection=connection, query='admin_login', inputs=data.values())
     if result:
         USERNAME = result[0][0]
