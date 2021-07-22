@@ -7,6 +7,8 @@ create our tables.
 import sqlite3 
 from sqlite3 import Error
 import os
+from sqlite3.dbapi2 import Connection, connect
+from main import DATABASE
 
 
 MAIN_DIR = './sql/'
@@ -84,3 +86,11 @@ def initialize_triggers(connection):
                 print(f"> Trigger {file} added")
             except Error as e:
                 print(e)
+
+
+if __name__ == "__main__":
+    create_database(db_file=DATABASE)
+    connection = create_connection(db_file=DATABASE)
+    initialize_tables(connection=connection)
+    initialize_triggers(connection=connection)
+    connection.close()

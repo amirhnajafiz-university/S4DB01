@@ -110,7 +110,7 @@ def clearScreen():
     """
     Simple method for formatting the console.
     """
-    # os.system('cls' if os.name=='nt' else 'clear')
+    os.system('cls' if os.name=='nt' else 'clear')
     if ISADMIN:
         print(f"User {USERNAME} ", end="")
         print("As Admin\n")
@@ -876,7 +876,7 @@ def root():
     global PRO_ID, USER_DATA, USERNAME
     connection = create_connection(DATABASE)
     while True:
-        # os.system('cls' if os.name=='nt' else 'clear')
+        os.system('cls' if os.name=='nt' else 'clear')
         show_menu(START)
         command = input("> ")
         if command == '1':
