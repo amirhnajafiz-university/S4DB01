@@ -9,7 +9,7 @@
     "1": {
         "op": "insert_admin",
         "data": {
-            "username": "jason",
+            "username": "alireza",
             "password": "AB1270"
         }
     },
@@ -151,21 +151,31 @@
         "op": "insert_tag",
         "data": {
             "tag_id": 1,
-            "name": "comedy"
+            "name": "Comedy"
         }
     },
     "14": {
         "op": "insert_tag",
         "data": {
             "tag_id": 2,
-            "name": "horror"
+            "name": "Horror"
         }
     },
     "15": {
         "op": "insert_tag",
         "data": {
             "tag_id": 3,
-            "name": "action"
+            "name": "Action"
+        }
+    },
+	"16": {
+        "op": "insert_movie",
+        "data": {
+            "movie_id": 9,
+            "movie_file": "New File",
+            "name": "Toy Story",
+            "movie_year": 1999,
+            "description": "Life of your toys."
         }
     }
 }

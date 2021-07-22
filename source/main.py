@@ -873,6 +873,7 @@ def root():
     """
     root is our project main function that starts the application.
     """
+    global PRO_ID, USER_DATA, USERNAME
     connection = create_connection(DATABASE)
     while True:
         os.system('cls' if os.name=='nt' else 'clear')
@@ -886,6 +887,9 @@ def root():
             break
         else:
             print(INPUT_ERROR)
+        PRO_ID = None
+        USERNAME = None
+        USER_DATA = None
     connection.close()
 
 
