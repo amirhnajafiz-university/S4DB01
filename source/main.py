@@ -299,13 +299,13 @@ def view_movie(connection, data):
     tags = execute_get_query(connection=connection, query="get_movie_tags", inputs=[data[0]])
     while True:
         clearScreen()
-        print(data)
+        printMovies(connection=connection, data=[data])
         if creators:
             print("Movie creator:")
-            printData(creators[0])
+            printData(creators)
         if tags:
             print("Movie tags:")
-            printData(tags[0])
+            printData(tags)
         if flag:
             print(f'Price: {flag[0][2]}$')
             show_menu(ADMIN_SELECT_MOVIE_SPECIAL)
@@ -876,7 +876,7 @@ def root():
     global PRO_ID, USER_DATA, USERNAME
     connection = create_connection(DATABASE)
     while True:
-        os.system('cls' if os.name=='nt' else 'clear')
+        # os.system('cls' if os.name=='nt' else 'clear')
         show_menu(START)
         command = input("> ")
         if command == '1':
