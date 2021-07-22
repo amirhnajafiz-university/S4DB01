@@ -16,3 +16,19 @@ Users can search movies, watch them, put comments for them and also list them.
 Admin can add, remove or edit the movies.
 
 Check the project <a href="./schema/README.md">Schema</a> for more information about how the project is implement.
+
+## Execute
+First install module <b>SQLite3</b> for python3:
+```shell
+pip install pysqlite3
+```
+
+The run the <i>createDB</i> file:
+```shell
+python createDB.py
+```
+
+After that run the application on main:
+```shell
+python main.py
+```
