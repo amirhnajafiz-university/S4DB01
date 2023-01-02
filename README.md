@@ -1,11 +1,14 @@
-# DB-Final-Project
+<h1 align="center">
+Stream Database
+</h1>
+
+<br />
 
 My database final project at AUT.CEIT
 
 <p align="center">
     <img src=".vscode/demo.gif" width="500" />
 </p>
-
 
 ## Project
 The main idea was to create a strem website database, where we have some 
